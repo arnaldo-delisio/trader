@@ -3,6 +3,16 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T16:15:00+00:00 · ok
+
+- Avvio: 2026-09-27T16:17:26.856978+00:00  Fine: 2026-09-27T16:18:36.138007+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36332666112
+- Cosa è cambiato: trd-20260927T1615Z-BONKUSD-buy (placed), trd-20260927T1615Z-ONDOUSD-buy (placed)
+- Esito: compra BONK/USD: inviato; compra ONDO/USD: inviato
+- Rischio residuo: investito 7077.16$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, ETHUSD, FILUSD, GRTUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Controllare se UNI ha toccato lo stop a 9.57058 (distanza attuale ~0.45%) o se ARB (score -0.11) è sceso sotto -0.3, e verificare l'esito delle nuove posizioni esplorative su BONK e ONDO aperte in questo slot.
+- Attenzione: ordine trd-20260927T1545Z-POLUSD-buy (buy POL/USD, aperto da 29 min): annullato
+<!-- entry -->
 ## 2026-09-27T16:00:00+00:00 · ok
 
 - Avvio: 2026-09-27T16:02:40.442625+00:00  Fine: 2026-09-27T16:03:40.606770+00:00

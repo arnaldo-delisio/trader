@@ -44,6 +44,17 @@
       "stop": 0.09221803353485744,
       "take_profit": 0.10647106566735837
     },
+    "BONK/USD": {
+      "atr_at_entry": 6.029988083964632e-08,
+      "client_order_id": "trd-20260927T1615Z-BONKUSD-buy",
+      "entry_at": "2026-09-27 16:17 UTC",
+      "entry_price": 3.73e-06,
+      "entry_t": 1790525846,
+      "explore": true,
+      "highest": 3.73e-06,
+      "stop": 3.4888004766414144e-06,
+      "take_profit": 4.091799285037878e-06
+    },
     "DOT/USD": {
       "atr_at_entry": 0.022506799666063615,
       "client_order_id": "trd-20260926T2345Z-DOTUSD-buy",
@@ -84,8 +95,8 @@
       "entry_price": 0.028413,
       "entry_t": 1790521353,
       "explore": true,
-      "highest": 0.0285083,
-      "stop": 0.0269858574105941,
+      "highest": 0.028751,
+      "stop": 0.02717843188126595,
       "take_profit": 0.030696663885367306
     },
     "LINK/USD": {
@@ -98,6 +109,17 @@
       "highest": 14.443,
       "stop": 13.836599837908402,
       "take_profit": 15.175744285783015
+    },
+    "ONDO/USD": {
+      "atr_at_entry": 0.008433102648606618,
+      "client_order_id": "trd-20260927T1615Z-ONDOUSD-buy",
+      "entry_at": "2026-09-27 16:17 UTC",
+      "entry_price": 0.545928,
+      "entry_t": 1790525846,
+      "explore": true,
+      "highest": 0.545928,
+      "stop": 0.5121955894055735,
+      "take_profit": 0.5965266158916397
     },
     "POL/USD": {
       "atr_at_entry": 0.0013983449406957513,
@@ -166,5 +188,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T16:02:40.442718+00:00"
+  "updated_at": "2026-09-27T16:17:26.857115+00:00"
 }
