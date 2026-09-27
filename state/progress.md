@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T14:30:00+00:00 · ok
+
+- Avvio: 2026-09-27T14:32:41.002890+00:00  Fine: 2026-09-27T14:33:19.676201+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36326284621
+- Cosa è cambiato: trd-20260927T1430Z-ETHUSD-buy (placed)
+- Esito: compra ETH/USD: inviato
+- Rischio residuo: investito 5672.41$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Controllare se ARB e LINK (score più deboli, +0.24 e +0.23) toccano lo stop o l'uscita a -0.3, verificare i primi trade chiusi per validare la soglia 0.80, e monitorare l'evoluzione della nuova posizione esplorativa su ETH.
+<!-- entry -->
 ## 2026-09-27T14:15:00+00:00 · ok
 
 - Avvio: 2026-09-27T14:17:43.000734+00:00  Fine: 2026-09-27T14:18:33.416333+00:00

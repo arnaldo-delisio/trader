@@ -1,67 +1,32 @@
 {
-  "slot": "2026-09-27T14:15:00+00:00",
-  "slot_id": "20260927T1415Z",
-  "started_at": "2026-09-27T14:17:43.000734+00:00",
-  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36325375147",
+  "slot": "2026-09-27T14:30:00+00:00",
+  "slot_id": "20260927T1430Z",
+  "started_at": "2026-09-27T14:32:41.002890+00:00",
+  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36326284621",
   "dry_run": false,
   "status": "ok",
   "decisions": [
     {
-      "symbol": "RENDER/USD",
-      "action": "buy",
-      "requested_usd": 900.0,
-      "approved": true,
-      "reason": "ammesso",
-      "order": {
-        "symbol": "RENDER/USD",
-        "side": "buy",
-        "notional": 900.0
-      },
-      "explore": true,
-      "reason_model": "ADX 30 e trend 4h/1h a +1.00 con score 0.76 vicino alla soglia giustificano una posizione esplorativa ridotta rispetto al massimo 1499.49$.",
-      "bull_case": "Momentum forte (7g +33.3%, trend 4h/1h pieni) con ADX 30 che conferma un trend robusto e RSI 54 non ipercomprato.",
-      "bear_case": "Punteggio 0.76 resta sotto la soglia 0.80 e il costo del giro (0.89%) erode buona parte del margine su mosse piccole.",
-      "auto": false,
-      "outcome": "placed",
-      "client_order_id": "trd-20260927T1415Z-RENDERUSD-buy",
-      "detail": "inviato",
-      "stop": 1.9226606549587266,
-      "take_profit": 2.2210090175619097
-    },
-    {
-      "symbol": "POL/USD",
-      "action": "buy",
-      "requested_usd": 900.0,
-      "approved": true,
-      "reason": "ammesso",
-      "order": {
-        "symbol": "POL/USD",
-        "side": "buy",
-        "notional": 900.0
-      },
-      "explore": true,
-      "reason_model": "ADX 36 indica il trend più forte del gruppo esplorativo, sufficiente per una size moderata sotto il massimo 1499.49$.",
-      "bull_case": "ADX 36 è il più alto tra i candidati esplorativi, segnale di trend solido, con 7g +16.6% e RSI 57 equilibrato.",
-      "bear_case": "Score 0.71 è il più lontano dalla soglia piena e il prezzo molto basso (0.1204) amplifica l'impatto dello slippage relativo.",
-      "auto": false,
-      "outcome": "placed",
-      "client_order_id": "trd-20260927T1415Z-POLUSD-buy",
-      "detail": "inviato",
-      "stop": 0.11484959104065963,
-      "take_profit": 0.12897561343901054
-    },
-    {
       "symbol": "ETH/USD",
-      "action": "hold",
-      "requested_usd": 0.0,
-      "approved": false,
-      "reason": "hold: nessun ordine",
-      "order": null,
-      "explore": false,
-      "reason_model": "ADX 13 troppo basso per giustificare l'ingresso anche in esplorazione; meglio aspettare conferma di trend più solida.",
-      "bull_case": "Score 0.63 con trend 4h/1h pieni e liquidità/costo giro basso (0.52%) lo rendono il più economico da negoziare.",
-      "bear_case": "ADX 13 è debolissimo, segno che il trend non è ancora confermato nonostante i flag direzionali, e il 7g +5.0% è modesto.",
-      "auto": false
+      "action": "buy",
+      "requested_usd": 750.0,
+      "approved": true,
+      "reason": "ammesso",
+      "order": {
+        "symbol": "ETH/USD",
+        "side": "buy",
+        "notional": 750.0
+      },
+      "explore": true,
+      "reason_model": "Score 0.63 con ATR 0.36% e costo 0.53%: rischio/costo contenuto ma ADX 13 debole, quindi size ridotta a metà del massimo (750$ su 1499.04$ disponibili).",
+      "bull_case": "Trend 4h e 1h entrambi a +1.00, RSI 60 neutro-rialzista e costo giro molto basso (0.53%) rendono l'ingresso economico rispetto al potenziale move.",
+      "bear_case": "ADX a soli 13 indica un trend debole e poco direzionale, e lo score 0.63 resta ben sotto la soglia piena 0.80.",
+      "auto": false,
+      "outcome": "placed",
+      "client_order_id": "trd-20260927T1430Z-ETHUSD-buy",
+      "detail": "inviato",
+      "stop": 2656.0556747932014,
+      "take_profit": 2752.3164878101975
     },
     {
       "symbol": "AAVE/USD",
@@ -71,9 +36,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.37 sopra la soglia di uscita -0.3 e prezzo entro stop/take-profit: lascio gestire a stop/scadenza.",
-      "bull_case": "Score ancora positivo (+0.37) e prezzo vicino all'entrata (-0.5%), nessun segnale di rottura imminente.",
-      "bear_case": "Score sceso molto rispetto ai livelli iniziali di esplorazione, segnale di indebolimento del momentum.",
+      "reason_model": "Posizione entro i parametri (-1.0% vs stop -3.0%), nessuna violazione della regola di uscita (-0.3), si lascia gestire da stop/TP.",
+      "bull_case": "Score ancora positivo (+0.37) e perdita contenuta (-1.0%), lontano dallo stop.",
+      "bear_case": "Trend debole rispetto all'entrata, nessun catalizzatore nuovo per aggiungere convinzione.",
       "auto": false
     },
     {
@@ -84,9 +49,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.24 sopra soglia di uscita -0.3, prezzo sopra stop: gestione automatica più adatta di una chiusura manuale ora.",
-      "bull_case": "Ancora sopra lo stop (0.215504) nonostante il calo, con margine di recupero possibile.",
-      "bear_case": "Score +0.24 debole e perdita -4.3% già significativa, vicina relativamente allo stop rispetto alle altre posizioni.",
+      "reason_model": "Score +0.24 non ancora sotto la soglia di uscita -0.3; si mantiene la posizione e si lascia gestire lo stop a 0.215504.",
+      "bull_case": "Ancora sopra lo stop (2.5% di margine) e score positivo (+0.24).",
+      "bear_case": "Score tra i più deboli del portafoglio e perdita già al -4.8%, vicino a un possibile deterioramento ulteriore.",
       "auto": false
     },
     {
@@ -97,9 +62,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.69 ben sopra soglia di uscita, nessuna azione necessaria oltre stop/TP automatici.",
-      "bull_case": "Score +0.69 resta solido, vicino alla soglia piena, con calo contenuto (-2.1%).",
-      "bear_case": "Perdita del 2.1% in 7h indica volatilità superiore alla media del paniere.",
+      "reason_model": "Score +0.69 ben sopra la soglia di uscita, si lascia correre fino a stop/TP/scadenza.",
+      "bull_case": "Score solido +0.69, tra i migliori del book aperto.",
+      "bear_case": "Perdita -2.4% mostra pressione ribassista di breve termine.",
       "auto": false
     },
     {
@@ -110,9 +75,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.74 solido, nessun segnale di uscita anticipata giustificato.",
-      "bull_case": "Score +0.74 tra i più alti del portafoglio, quasi in pareggio dopo 15h.",
-      "bear_case": "Posizione aperta da 15h senza progresso verso il take-profit, capitale bloccato.",
+      "reason_model": "Score +0.74 solido, nessun segnale di deterioramento, si mantiene.",
+      "bull_case": "Score alto +0.74 e perdita minima (-0.3%).",
+      "bear_case": "Posizione aperta da 15h senza progresso netto verso il take-profit.",
       "auto": false
     },
     {
@@ -123,9 +88,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Nessun trigger di stop, take-profit o score negativo: mantengo.",
-      "bull_case": "Score +0.56 ancora positivo con perdita minima (-0.4%).",
-      "bear_case": "14h in posizione senza progresso significativo verso il take-profit.",
+      "reason_model": "Nessuna violazione della regola di uscita, si lascia gestire da stop/TP/scadenza.",
+      "bull_case": "Score +0.56 ancora positivo, perdita marginale (-0.5%).",
+      "bear_case": "15h senza direzione chiara verso il take-profit.",
       "auto": false
     },
     {
@@ -136,9 +101,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score sopra soglia di uscita, gestione automatica sufficiente.",
-      "bull_case": "Score +0.57 e perdita contenuta (-0.5%) dopo 14h.",
-      "bear_case": "Trend laterale prolungato senza avvicinamento al take-profit.",
+      "reason_model": "Score sopra la soglia di uscita -0.3, si mantiene la posizione.",
+      "bull_case": "Score +0.57 discreto, perdita contenuta (-0.4%).",
+      "bear_case": "15h di lateralità senza progresso.",
       "auto": false
     },
     {
@@ -149,9 +114,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.23 ancora sopra la soglia di uscita -0.3 ma vicino: monitorare, per ora hold.",
-      "bull_case": "Prezzo quasi invariato (-0.3%), rischio di stop non imminente.",
-      "bear_case": "Score sceso a +0.23, tra i più deboli del portafoglio, segnale di momentum in esaurimento.",
+      "reason_model": "Score +0.23 debole ma non sotto la soglia di uscita -0.3; si continua a monitorare senza intervenire.",
+      "bull_case": "Ancora positivo (+0.23) e perdita minima (-0.6%).",
+      "bear_case": "Score tra i più deboli, segnalato nel wake precedente come da monitorare.",
       "auto": false
     },
     {
@@ -162,9 +127,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score solido e posizione troppo recente per giudicare, mantengo.",
-      "bull_case": "Score +0.74 forte, posizione aperta da solo 1h, ancora tempo per svilupparsi.",
-      "bear_case": "Prezzo piatto (0.0%), nessuna conferma direzionale ancora.",
+      "reason_model": "Score solido, nessun segnale di uscita anticipata necessario.",
+      "bull_case": "Score alto +0.74, posizione recente (2h) con margine sopra lo stop.",
+      "bear_case": "Perdita -0.8% mostra pressione iniziale contraria.",
       "auto": false
     },
     {
@@ -175,9 +140,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Andamento positivo e score sopra soglia di uscita: nessuna azione.",
-      "bull_case": "Unica posizione in leggero guadagno (+0.5%) con score +0.58.",
-      "bear_case": "Guadagno minimo dopo 14h, momentum non ancora convincente.",
+      "reason_model": "Score positivo e trend in linea, si mantiene.",
+      "bull_case": "Unica posizione in leggero guadagno (+0.1%) con score +0.58.",
+      "bear_case": "14h senza movimento significativo verso il take-profit.",
       "auto": false
     },
     {
@@ -188,9 +153,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score solido, nessun trigger di uscita.",
-      "bull_case": "Score +0.72, tra i più alti, prezzo stabile.",
-      "bear_case": "13h senza movimento verso il take-profit.",
+      "reason_model": "Score ben sopra soglia di uscita, si lascia gestire da stop/TP.",
+      "bull_case": "Score alto +0.72, tra i migliori aperti.",
+      "bear_case": "Perdita -0.5% dopo 13h, ancora senza progresso deciso.",
       "auto": false
     },
     {
@@ -201,40 +166,38 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score ancora positivo, sopra soglia di uscita -0.3, mantengo in attesa di stop/TP/scadenza.",
-      "bull_case": "Prezzo praticamente invariato, nessun rischio di stop imminente.",
-      "bear_case": "Score sceso a +0.48, il più basso tra le posizioni con margine intatto, segnale di indebolimento.",
+      "reason_model": "Nessuna violazione delle regole di uscita, si mantiene la posizione.",
+      "bull_case": "Score +0.48 ancora positivo, perdita minima (-0.2%).",
+      "bear_case": "9h senza direzione chiara.",
       "auto": false
     }
   ],
-  "warnings": [
-    "saltati 4 slot dall'ultimo risveglio (20260927T1300Z): nessun recupero"
-  ],
+  "warnings": [],
   "alerts": [],
-  "changed": "trd-20260927T1415Z-RENDERUSD-buy (placed), trd-20260927T1415Z-POLUSD-buy (placed)",
-  "outcome": "compra RENDER/USD: inviato; compra POL/USD: inviato",
-  "remaining_risk": "investito 5702.18$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti",
-  "next_job": "Verificare se le nuove posizioni esplorative su RENDER e POL si muovono a favore, controllare i primi trade chiusi (stop/TP/scadenza) per iniziare a validare la soglia 0.80, e monitorare LINK e ARB che hanno gli score più deboli (+0.23/+0.24) tra le posizioni aperte.",
-  "equity": 99966.26,
+  "changed": "trd-20260927T1430Z-ETHUSD-buy (placed)",
+  "outcome": "compra ETH/USD: inviato",
+  "remaining_risk": "investito 5672.41$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti",
+  "next_job": "Controllare se ARB e LINK (score più deboli, +0.24 e +0.23) toccano lo stop o l'uscita a -0.3, verificare i primi trade chiusi per validare la soglia 0.80, e monitorare l'evoluzione della nuova posizione esplorativa su ETH.",
+  "equity": 99936.49,
   "error": "",
   "positions": [
     {
       "symbol": "AAVE/USD",
-      "value": 483.25,
+      "value": 484.63,
       "stop": 150.6172469074415,
       "take_profit": 165.75183037279103,
       "entry_price": 155.3,
-      "price": 154.54,
+      "price": 153.776,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "ARB/USD",
-      "value": 855.45,
+      "value": 836.37,
       "stop": 0.21550389076916115,
       "take_profit": 0.2590857672527433,
       "entry_price": 0.2323,
-      "price": 0.2223,
+      "price": 0.22115,
       "exit": null,
       "explore": true
     },
@@ -244,7 +207,7 @@
       "stop": 10.579872854300781,
       "take_profit": 12.152900106974274,
       "entry_price": 11.185,
-      "price": 10.9462,
+      "price": 10.9173,
       "exit": null,
       "explore": true
     },
@@ -254,17 +217,17 @@
       "stop": 0.09216881344753437,
       "take_profit": 0.10647106566735837,
       "entry_price": 0.0958502,
-      "price": 0.0955344,
+      "price": 0.095521,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "DOT/USD",
-      "value": 389.67,
+      "value": 388.71,
       "stop": 1.205744536981007,
       "take_profit": 1.3781207979963817,
       "entry_price": 1.24308,
-      "price": 1.2376,
+      "price": 1.237,
       "exit": null,
       "explore": true
     },
@@ -274,27 +237,27 @@
       "stop": 1.081775244141593,
       "take_profit": 1.2990018659088813,
       "entry_price": 1.138,
-      "price": 1.1327,
+      "price": 1.1335,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "LINK/USD",
-      "value": 487.9,
+      "value": 485.27,
       "stop": 13.836599837908402,
       "take_profit": 15.175744285783015,
       "entry_price": 14.1548,
-      "price": 14.119,
+      "price": 14.063,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "SOL/USD",
-      "value": 585.6,
+      "value": 580.94,
       "stop": 118.9610853817643,
       "take_profit": 129.16240055691708,
       "entry_price": 123.01,
-      "price": 123.0,
+      "price": 122.064,
       "exit": null,
       "explore": true
     },
@@ -304,17 +267,17 @@
       "stop": 0.2625350447692423,
       "take_profit": 0.2905411298734655,
       "entry_price": 0.2672,
-      "price": 0.2685,
+      "price": 0.267586,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "UNI/USD",
-      "value": 392.29,
+      "value": 388.47,
       "stop": 9.570583171458745,
       "take_profit": 10.703818506906753,
       "entry_price": 9.846,
-      "price": 9.842,
+      "price": 9.7972,
       "exit": null,
       "explore": true
     },
@@ -324,13 +287,12 @@
       "stop": 2439.310218463671,
       "take_profit": 2622.26135795356,
       "entry_price": 2482.45,
-      "price": 2482.41,
+      "price": 2478.19,
       "exit": null,
       "explore": true
     }
   ],
-  "missed_slots": 4,
-  "day_change_pct": -0.03374000000000432,
+  "day_change_pct": -0.06350999999999996,
   "market": {
     "coins": 31,
     "missing": [],
@@ -339,9 +301,9 @@
     "breadth_pct": 96.7741935483871
   },
   "regime": "risk_on",
-  "market_view": "Il mercato resta in risk_on con momentum di 7 giorni molto forte (+16.22%) ma quasi tutti i candidati con ADX elevato (POL 36, RENDER 30) mostrano punteggi ancora appena sotto la soglia piena, mentre le 11 posizioni esplorative aperte oscillano vicino al pareggio senza esiti chiusi da valutare.",
-  "finished_at": "2026-09-27T14:18:33.416333+00:00",
-  "commit_message": "Record wake 20260927T1415Z ok",
+  "market_view": "Il mercato resta in risk_on con momentum di 7 giorni forte (+16.22%), ma quasi tutti i segnali restano appena sotto la soglia piena 0.80 (RENDER 0.76, BTC 0.72, POL 0.71) mentre le 11 posizioni esplorative aperte oscillano vicino al pareggio senza ancora generare trade chiusi da cui imparare.",
+  "finished_at": "2026-09-27T14:33:19.676201+00:00",
+  "commit_message": "Record wake 20260927T1430Z ok",
   "notified": true,
   "notify_detail": "inviato"
 }

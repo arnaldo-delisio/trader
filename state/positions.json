@@ -55,6 +55,17 @@
       "stop": 1.205744536981007,
       "take_profit": 1.3781207979963817
     },
+    "ETH/USD": {
+      "atr_at_entry": 9.626081301699585,
+      "client_order_id": "trd-20260927T1430Z-ETHUSD-buy",
+      "entry_at": "2026-09-27 14:32 UTC",
+      "entry_price": 2694.56,
+      "entry_t": 1790519561,
+      "explore": true,
+      "highest": 2694.56,
+      "stop": 2656.0556747932014,
+      "take_profit": 2752.3164878101975
+    },
     "FIL/USD": {
       "atr_at_entry": 0.02683364431814692,
       "client_order_id": "trd-20260926T2345Z-FILUSD-buy",
@@ -144,5 +155,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T14:17:43.000856+00:00"
+  "updated_at": "2026-09-27T14:32:41.002979+00:00"
 }
