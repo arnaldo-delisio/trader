@@ -8,7 +8,7 @@
       "entry_t": 1790487165,
       "explore": true,
       "highest": 157.3115,
-      "stop": 150.11181281609853,
+      "stop": 150.6172469074415,
       "take_profit": 165.75183037279103
     },
     "ARB/USD": {
@@ -19,7 +19,7 @@
       "entry_t": 1790497036,
       "explore": true,
       "highest": 0.2323,
-      "stop": 0.21444282183150448,
+      "stop": 0.21504049785682963,
       "take_profit": 0.2590857672527433
     },
     "AVAX/USD": {
@@ -30,7 +30,7 @@
       "entry_t": 1790495258,
       "explore": true,
       "highest": 11.23805,
-      "stop": 10.563916600444497,
+      "stop": 10.579872854300781,
       "take_profit": 12.152900106974274
     },
     "BAT/USD": {
@@ -40,8 +40,8 @@
       "entry_price": 0.0958502,
       "entry_t": 1790464582,
       "explore": true,
-      "highest": 0.0971586,
-      "stop": 0.09087290726906748,
+      "highest": 0.0978995,
+      "stop": 0.09216881344753437,
       "take_profit": 0.10647106566735837
     },
     "DOT/USD": {
@@ -52,7 +52,7 @@
       "entry_t": 1790466519,
       "explore": true,
       "highest": 1.274575,
-      "stop": 1.1951079461706307,
+      "stop": 1.204403732256357,
       "take_profit": 1.3781207979963817
     },
     "FIL/USD": {
@@ -63,7 +63,7 @@
       "entry_t": 1790466519,
       "explore": true,
       "highest": 1.1566,
-      "stop": 1.0688619155979775,
+      "stop": 1.0804502629012402,
       "take_profit": 1.2990018659088813
     },
     "LINK/USD": {
@@ -74,7 +74,7 @@
       "entry_t": 1790467225,
       "explore": true,
       "highest": 14.443,
-      "stop": 13.786043504710937,
+      "stop": 13.836599837908402,
       "take_profit": 15.175744285783015
     },
     "RENDER/USD": {
@@ -88,6 +88,17 @@
       "stop": 1.9431258493840298,
       "take_profit": 2.270336225923955
     },
+    "SOL/USD": {
+      "atr_at_entry": 1.0254000928195113,
+      "client_order_id": "trd-20260927T1300Z-SOLUSD-buy",
+      "entry_at": "2026-09-27 13:02 UTC",
+      "entry_price": 123.01,
+      "entry_t": 1790514120,
+      "explore": true,
+      "highest": 123.01,
+      "stop": 118.90839962872197,
+      "take_profit": 129.16240055691708
+    },
     "SUSHI/USD": {
       "atr_at_entry": 0.0038901883122442514,
       "client_order_id": "trd-20260927T0030Z-SUSHIUSD-buy",
@@ -95,8 +106,8 @@
       "entry_price": 0.2672,
       "entry_t": 1790469112,
       "explore": true,
-      "highest": 0.2747505,
-      "stop": 0.259845134216334,
+      "highest": 0.276395,
+      "stop": 0.2624135097553315,
       "take_profit": 0.2905411298734655
     },
     "UNI/USD": {
@@ -118,9 +129,9 @@
       "entry_t": 1790485365,
       "explore": true,
       "highest": 2521.335,
-      "stop": 2430.460546665605,
+      "stop": 2439.310218463671,
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T08:17:16.936712+00:00"
+  "updated_at": "2026-09-27T13:02:00.917342+00:00"
 }

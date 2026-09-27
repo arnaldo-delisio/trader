@@ -3,6 +3,13 @@
 Scritte dalla riflessione ogni 6 ore, la più recente in alto. Il modello le rilegge a ogni risveglio.
 
 <!-- lesson -->
+## 2026-09-27 13:03 UTC · slot 20260927T1300Z
+
+- Con 0 trade chiusi (solo posizioni esplorative ancora aperte su BAT, POL, FIL, DOT, LINK, SUSHI, UNI, RENDER, YFI) manca qualsiasi base statistica: non modifico pesi, soglie, stop/TP o size in questa riflessione.
+- Il pattern ripetuto di punteggi appena sotto soglia (0.59-0.81, mai ≥0.80) resta un'ipotesi da testare con esiti reali di stop/TP/scadenza, non da anticipare abbassando entry_threshold senza dati.
+- Attendere almeno ~10 trade chiusi con risultato netto misurabile prima di distinguere segnali utili da rumore e valutare l'attribuzione per singolo indicatore.
+- Nessun cambiamento ai parametri finché il campione di operazioni chiuse resta a zero, per evitare di ottimizzare sul rumore delle sole posizioni ancora in corso.
+<!-- lesson -->
 ## 2026-09-27 06:03 UTC · slot 20260927T0600Z
 
 - Con 0 trade chiusi resta impossibile ogni attribuzione statistica: non modifico pesi, soglie o stop/TP in questa riflessione.

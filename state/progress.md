@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T13:00:00+00:00 · ok
+
+- Avvio: 2026-09-27T13:02:00.917266+00:00  Fine: 2026-09-27T13:03:25.291055+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36320981601
+- Cosa è cambiato: trd-20260927T1300Z-SOLUSD-buy (placed)
+- Esito: compra SOL/USD: inviato
+- Rischio residuo: investito 5107.09$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 0 ordini aperti
+- Prossimo compito: Controllare l'esito di SOL appena aperta e monitorare ARB/AVAX che si stanno avvicinando ai rispettivi stop (score +0.34 e +0.50), oltre a verificare se RENDER (0.78) o altri candidati superano la soglia piena 0.80; con ancora 0 trade chiusi, cercare i primi esiti reali per iniziare a validare la soglia d'ingresso.
+- Attenzione: saltati 18 slot dall'ultimo risveglio (20260927T0815Z): nessun recupero
+- Attenzione: ordine trd-20260927T0800Z-RENDERUSD-buy (buy RENDER/USD, aperto da 299 min): annullato
+<!-- entry -->
 ## 2026-09-27T08:15:00+00:00 · ok
 
 - Avvio: 2026-09-27T08:17:16.936549+00:00  Fine: 2026-09-27T08:18:04.623761+00:00
