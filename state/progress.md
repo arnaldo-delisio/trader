@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T08:15:00+00:00 · ok
+
+- Avvio: 2026-09-27T08:17:16.936549+00:00  Fine: 2026-09-27T08:18:04.623761+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36305709335
+- Cosa è cambiato: trd-20260927T0815Z-ARBUSD-buy (placed)
+- Esito: compra ARB/USD: inviato
+- Rischio residuo: investito 4304.47$ (prima degli ordini di questo slot) su AAVEUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Verificare l'esito della nuova posizione ARB e monitorare da vicino AAVE e YFI (score più bassi, +0.58 e +0.59) per eventuale avvicinamento alla soglia di uscita -0.3, oltre a controllare se RENDER (score 0.78) supera la soglia piena 0.80 nel prossimo ciclo.
+<!-- entry -->
 ## 2026-09-27T08:00:00+00:00 · ok
 
 - Avvio: 2026-09-27T08:02:18.267229+00:00  Fine: 2026-09-27T08:02:58.747282+00:00

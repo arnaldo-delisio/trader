@@ -11,6 +11,17 @@
       "stop": 150.11181281609853,
       "take_profit": 165.75183037279103
     },
+    "ARB/USD": {
+      "atr_at_entry": 0.004464294542123879,
+      "client_order_id": "trd-20260927T0815Z-ARBUSD-buy",
+      "entry_at": "2026-09-27 08:17 UTC",
+      "entry_price": 0.2323,
+      "entry_t": 1790497036,
+      "explore": true,
+      "highest": 0.2323,
+      "stop": 0.21444282183150448,
+      "take_profit": 0.2590857672527433
+    },
     "AVAX/USD": {
       "atr_at_entry": 0.1613166844957121,
       "client_order_id": "trd-20260927T0745Z-AVAXUSD-buy",
@@ -18,8 +29,8 @@
       "entry_price": 11.185,
       "entry_t": 1790495258,
       "explore": true,
-      "highest": 11.185,
-      "stop": 10.539733262017153,
+      "highest": 11.23805,
+      "stop": 10.563916600444497,
       "take_profit": 12.152900106974274
     },
     "BAT/USD": {
@@ -111,5 +122,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T08:02:18.267346+00:00"
+  "updated_at": "2026-09-27T08:17:16.936712+00:00"
 }
