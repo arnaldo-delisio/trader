@@ -84,8 +84,8 @@
       "entry_price": 0.028413,
       "entry_t": 1790521353,
       "explore": true,
-      "highest": 0.028413,
-      "stop": 0.02689055740975513,
+      "highest": 0.0285083,
+      "stop": 0.02698585740975513,
       "take_profit": 0.030696663885367306
     },
     "LINK/USD": {
@@ -109,6 +109,17 @@
       "highest": 0.11976,
       "stop": 0.11416662024519335,
       "take_profit": 0.12815006963220998
+    },
+    "RENDER/USD": {
+      "atr_at_entry": 0.02994913365768841,
+      "client_order_id": "trd-20260927T1515Z-RENDERUSD-buy",
+      "entry_at": "2026-09-27 15:17 UTC",
+      "entry_price": 2.018,
+      "entry_t": 1790522261,
+      "explore": true,
+      "highest": 2.018,
+      "stop": 1.8982034653692461,
+      "take_profit": 2.19769480194613
     },
     "SOL/USD": {
       "atr_at_entry": 1.0254000928195113,
@@ -155,5 +166,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T15:02:33.080152+00:00"
+  "updated_at": "2026-09-27T15:17:41.933802+00:00"
 }
