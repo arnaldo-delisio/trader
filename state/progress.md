@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T14:45:00+00:00 · no_trade
+
+- Avvio: 2026-09-27T14:47:37.050739+00:00  Fine: 2026-09-27T14:47:40.780309+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36327185663
+- Cosa è cambiato: niente
+- Esito: nessun ordine: nessun candidato d'ingresso e nessuna uscita
+- Rischio residuo: investito 6396.93$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 0 ordini aperti
+- Prossimo compito: ricontrollare stop e candidati con le nuove barre
+- Attenzione: ordine trd-20260927T1415Z-POLUSD-buy (buy POL/USD, aperto da 29 min): annullato
+- Attenzione: ordine trd-20260927T1415Z-RENDERUSD-buy (buy RENDER/USD, aperto da 29 min): annullato
+<!-- entry -->
 ## 2026-09-27T14:30:00+00:00 · ok
 
 - Avvio: 2026-09-27T14:32:41.002890+00:00  Fine: 2026-09-27T14:33:19.676201+00:00
