@@ -147,3 +147,24 @@ def test_api_valid_reply_is_parsed():
 
 def test_fake_model_exception_reply_holds():
     assert not FakeModel([RuntimeError("boom")]).propose("p").valid
+
+
+@pytest.mark.parametrize("raw,clean", [
+    ("Controllare RENDER</next_job>\n</invoke>", "Controllare RENDER"),
+    ("<parameter name=\"x\">vista</parameter>", "vista"),
+    ("RSI < 30 e score <0,8, prezzo > stop", "RSI < 30 e score <0,8, prezzo > stop"),
+    ("  due\n\nrighe  ", "due righe"),
+])
+def test_clean_text_strips_tags_and_keeps_comparisons(raw, clean):
+    from trader.model import clean_text
+    assert clean_text(raw) == clean
+
+
+def test_every_free_text_field_is_cleaned_by_validate():
+    junk = "</invoke>"
+    p = parse(json.dumps({"decisions": [{"symbol": "BTC/USD", "action": "buy", "notional_usd": 10,
+                                         "bull_case": "su" + junk, "bear_case": "giù" + junk,
+                                         "reason": "perché" + junk}],
+                          "market_view": "vista" + junk, "next_job": "compito</next_job>\n" + junk}))
+    d = p.decisions[0]
+    assert (d.bull_case, d.bear_case, d.reason, p.market_view, p.next_job) == ("su", "giù", "perché", "vista", "compito")

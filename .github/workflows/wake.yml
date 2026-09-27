@@ -1,11 +1,11 @@
 name: wake
 
-# A wake-up every 15 minutes. GitHub starts scheduled runs 5 to 15 minutes late and
-# sometimes skips them: the slot is the 15-minute bucket the run starts in
-# (trader/slot.py), a skipped slot is recorded and never caught up.
-# Check that the schedule fires: gh run list --workflow wake.yml --event schedule
-# (none had fired by 2026-09-26 23:15 UTC, 70 minutes after this cron was pushed and over
-# four hours after the first schedule was added; this edit re-registers it).
+# A wake-up every 15 minutes. GitHub starts scheduled runs late and sometimes skips them:
+# the slot is the 15-minute bucket the run starts in (trader/slot.py), a skipped slot is
+# recorded and never caught up. Check that the schedule fires:
+#   gh run list --workflow wake.yml --event schedule
+# When it does not, trigger the same workflow from outside (README, "Se il cron di GitHub
+# non parte"): a second trigger in the same slot only reads, it never orders twice.
 on:
   schedule:
     - cron: "*/15 * * * *"
@@ -46,8 +46,10 @@ jobs:
       JEV_API_KEY: ${{ secrets.JEV_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       MODEL: ${{ vars.MODEL || 'claude-cli' }}
-      # The kill switch as a repository variable: without it set to true, nothing trades.
+      # Repository variables. TRADING_ENABLED not true: no new buys, exits still sell.
+      # LIQUIDATE true: sell everything, cancel open orders, report the P&L.
       TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'false' }}
+      LIQUIDATE: ${{ vars.LIQUIDATE || 'false' }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       INPUT_SLOT: ${{ inputs.slot }}
       INPUT_DRY_RUN: ${{ inputs.dry_run }}
@@ -81,22 +83,17 @@ jobs:
 
       # Records are committed whenever the wake ran, including when it failed:
       # a failed wake-up's handoff is exactly what the next one needs to read.
+      # When another wake pushed first, save-records writes this wake's records on top of
+      # it instead of rebasing (trader/publish.py): appends never conflict that way.
       - name: Commit records
         if: always() && steps.wake.outcome != 'skipped' && env.INPUT_DRY_RUN != 'true'
         run: |
           git config user.name "trader-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state journal evidence lessons config/params.json
-          if git diff --cached --quiet; then echo "nessun record da salvare"; exit 0; fi
-          msg=$(python3 -c "import json;h=json.load(open('state/last_handoff.json'));print(h.get('commit_message') or 'Record wake ' + h['slot_id'] + ' ' + h['status'])")
-          git commit -q -m "$msg"
-          for i in 1 2 3 4 5; do
-            if git pull --rebase -q origin work && git push -q origin HEAD:work; then exit 0; fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((i * 5))
-          done
-          echo "push dei record fallito dopo 5 tentativi" >&2
-          exit 1
+          if ! uv run --frozen python -m trader save-records --branch work; then
+            uv run --frozen python -m trader alert "push dei record fallito: i record di questo risveglio non sono sul branch" || true
+            exit 1
+          fi
 
       # The wake notifies on its own failures. This covers the case where it never ran.
       - name: Alert if the wake did not run

@@ -131,6 +131,28 @@ class Alpaca:
             raise BrokerUnavailable(f"POST /v2/orders: HTTP {status}")
         raise BrokerHTTPError(status, text)
 
+    def cancel_order(self, order_id: str) -> None:
+        """DELETE /v2/orders/{id}. Cancelling twice changes nothing, so a network error or a
+        5xx is retried like a read. 204 is success; 422 means the order can no longer be
+        cancelled (usually it filled): BrokerHTTPError, the caller reports it."""
+        url = f"{self.base}/v2/orders/{urllib.parse.quote(order_id, safe='')}"
+        last = ""
+        for attempt in range(self.retries):
+            if attempt:
+                self.sleep(2 ** (attempt - 1))
+            try:
+                status, text = self.transport("DELETE", url, self.headers, None)
+            except TransportError as e:
+                last = str(e)
+                continue
+            if status in (200, 204):
+                return
+            if _retryable(status):
+                last = f"HTTP {status}"
+                continue
+            raise BrokerHTTPError(status, text)
+        raise BrokerUnavailable(f"DELETE /v2/orders/{{id}} failed after {self.retries} attempts: {last}")
+
     # ---- market data ----------------------------------------------------
     def latest_quotes(self, symbols: list[str]) -> dict:
         return self._get(f"{DATA_URL}/latest/quotes", {"symbols": ",".join(symbols)})["quotes"]

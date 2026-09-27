@@ -71,7 +71,7 @@ class World:
             shutil.copy(REPO / rel, self.dir / rel)
         if not explore:
             lim = self.dir / "config/limits.toml"
-            lim.write_text(lim.read_text().replace("explore_total_pct = 5.0", "explore_total_pct = 0.0"))
+            lim.write_text(lim.read_text().replace("explore_total_pct = 15.0", "explore_total_pct = 0.0"))
         p = json.loads((REPO / "config/params.json").read_text())
         p.update({"entry_threshold": 0.6, "min_edge_mult": 10.0, **params})
         (self.dir / "config/params.json").write_text(json.dumps(p))
@@ -277,6 +277,10 @@ def main() -> int:
     h = w.handoff()
     step(h["status"] == "ok", "l'ordine e il handoff ci sono comunque")
     step(h["notified"] is False, "il handoff registra che la notifica non è partita")
+    w.telegram_down = False
+    w.wake(reply(("SOL/USD", "hold", 0)), slot=later)
+    step(any("non è arrivato" in m for m in w.trades()),
+         "il risveglio dopo lo dice su Telegram, con il riassunto di quello perso")
 
     scenario(17, "Riflessione: una modifica che peggiora il backtest")
     w = World()
@@ -321,16 +325,48 @@ def main() -> int:
     w.wake(reply(("BTC/USD", "buy", 70)))
     j = w.journal()[-1]
     info("nessuna crypto passa la regola d'ingresso; BTC, SOL e DOGE sono in tendenza sul 4h")
-    info(f"candidati di esplorazione: {j['explore_candidates']} (1% del patrimonio x 0,7 del regime neutro)")
+    info(f"candidati di esplorazione: {j['explore_candidates']} (1,5% del patrimonio x 0,7 del regime neutro)")
     step(j["verdicts"][0]["approved"] and j["verdicts"][0]["explore"], "il gate ammette BTC come esplorazione")
     step(json.loads((w.dir / "state/positions.json").read_text())["positions"]["BTC/USD"]["explore"],
          "la posizione resta etichettata 'esplorazione' nei livelli d'uscita")
     step(any("esplorazione" in m for m in w.sent), "e su Telegram")
     w = World(entry_threshold=0.9)
-    w.wake(reply(("BTC/USD", "buy", 150)))
+    w.wake(reply(("BTC/USD", "buy", 200)))
     v = w.journal()[-1]["verdicts"][0]
-    info("il modello chiede 150 $: più dell'1% del patrimonio")
+    info("il modello chiede 200 $: più dell'1,5% del patrimonio")
     step(not v["approved"] and "esplorazione" in v["reason"], "respinto: " + v["reason"])
+
+    scenario(21, "Acquisti sospesi (TRADING_ENABLED=false): le uscite restano")
+    w = World()
+    w.wake()
+    w.broker.prices["BTC/USD"] *= 0.9
+    w.wake(slot=later, env={"TRADING_ENABLED": "false"})
+    info("BTC scende sotto lo stop mentre gli acquisti sono sospesi")
+    step([o["side"] for o in w.broker.orders] == ["buy", "sell"], "nessun acquisto, ma lo stop vende")
+
+    scenario(22, "Ordine fermo da più di 20 minuti")
+    w = World()
+    w.broker.fill_orders = False
+    w.broker.add_order("trd-20260926T0715Z-SOLUSD-buy", "SOL/USD", "buy", notional=300,
+                       created_at=(SLOT - timedelta(minutes=40)).isoformat())
+    w.broker.fill_orders = True
+    w.wake(reply(("BTC/USD", "hold", 0)))
+    info("un acquisto SOL/USD dello slot 07:15 è ancora aperto, non eseguito")
+    step(w.broker.orders[0]["status"] == "canceled", "il risveglio lo annulla")
+    step(w.journal()[-1]["canceled_orders"][0]["client_order_id"] == "trd-20260926T0715Z-SOLUSD-buy",
+         "l'annullamento è nel journal")
+    step(any("annullato" in m for m in w.trades()), "e su Telegram")
+
+    scenario(23, "Liquidazione (LIQUIDATE=true)")
+    w = World()
+    w.wake(reply(("BTC/USD", "buy", 50), ("SOL/USD", "buy", 50)))
+    w.wake(slot=later, env={"LIQUIDATE": "true"})
+    h = w.handoff()
+    info("due posizioni aperte; la variabile LIQUIDATE vale true")
+    step(not any(q * w.broker.prices[w.broker.symbol_of(k)] >= 1 for k, q in w.broker.positions.items()),
+         "tutte le posizioni vendute a mercato")
+    step(h["status"] == "liquidated", f"risultato realizzato: {h['liquidation']['pnl_usd']:+.2f} $")
+    step(any("Tutto venduto" in m for m in w.trades()), "il risultato finale arriva su Telegram")
 
     ok = sum(results)
     colour = GREEN if ok == len(results) else RED

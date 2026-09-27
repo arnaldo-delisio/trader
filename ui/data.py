@@ -15,11 +15,10 @@ from dataclasses import asdict, is_dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from trader import config, learn
+from trader import config, learn, notify
 from trader.records import ENTRY_MARK as PROGRESS_MARK
+from trader.records import alpaca_objects
 
-# trader.config owns the memecoin list; the fallback only covers a checkout that predates it.
-_MEME_FALLBACK = frozenset({"DOGE", "SHIB", "PEPE", "BONK", "WIF", "TRUMP", "FLOKI"})
 TRADE_OUTCOMES = ("placed", "adopted", "dry_run", "filled")
 # Where the exit levels of open positions may live. The first one that exists wins.
 LEVEL_FILES = ("state/positions.json", "state/exits.json", "state/levels.json")
@@ -56,10 +55,7 @@ def symbol(s) -> str:
 
 
 def is_meme(sym) -> bool:
-    s = symbol(sym)
-    if hasattr(config, "is_memecoin"):
-        return bool(config.is_memecoin(s))
-    return s.split("/")[0] in _MEME_FALLBACK
+    return config.is_memecoin(symbol(sym))
 
 
 def safe_url(u) -> str:
@@ -218,7 +214,9 @@ def positions(r: Reader, handoff: dict) -> list[dict]:
         entry = num(p.get("avg_entry_price")) or num(p.get("entry_price")) or num(lv.get("entry_price"))
         price = num(p.get("current_price")) or num(p.get("price"))
         qty = num(p.get("qty"))
-        mv = num(p.get("market_value")) or (qty * price if qty is not None and price else None)
+        # Alpaca's positions say market_value; the handoff's position rows say value.
+        mv = (num(p.get("market_value")) or num(p.get("value"))
+              or (qty * price if qty is not None and price else None))
         pnl_pct = num(p.get("unrealized_plpc"))
         pnl_pct = pnl_pct * 100 if pnl_pct is not None else (
             (price / entry - 1) * 100 if price and entry else None)
@@ -293,8 +291,7 @@ def trades(journal: list[dict], evidence: list[dict]) -> list[dict]:
 
 
 def closed_stats(r: Reader, journal: list[dict], evidence: list[dict]) -> dict:
-    fills = [e["alpaca"] for e in evidence if e.get("kind") == "fill" and isinstance(e.get("alpaca"), dict)]
-    orders = [e["alpaca"] for e in evidence if e.get("kind") == "order" and isinstance(e.get("alpaca"), dict)]
+    fills, orders = alpaca_objects(evidence, "fill"), alpaca_objects(evidence, "order")
     try:
         closed = learn.closed_trades(fills, orders, journal, learn.FEE_PCT)
         summary = learn.summarize(closed)
@@ -383,8 +380,10 @@ def param_changes(journal: list[dict]) -> list[dict]:
     return out[:MAX_CHANGES]
 
 
-def limits(r: Reader) -> dict:
-    """The limits in force: what the config asks, after the code's ceilings, and the ceilings."""
+def limits(r: Reader, status: str = "") -> dict:
+    """The limits in force: what the config asks, after the code's ceilings, and the ceilings.
+    The page sees the KILL file but not the repository variables (TRADING_ENABLED, LIQUIDATE):
+    those show through the status of the last handoff."""
     effective = {}
     try:
         lim = config.load_limits(r.root / "config/limits.toml")
@@ -393,8 +392,7 @@ def limits(r: Reader) -> dict:
         pass
     except Exception as e:  # noqa: BLE001 - shown on the page
         r.problems.append(f"config/limits.toml non caricato: {type(e).__name__}: {e}")
-    ceilings = dict(getattr(config, "HARD_CEILINGS", {}))
-    floors = dict(getattr(config, "HARD_FLOORS", {}))
+    ceilings, floors = dict(config.HARD_CEILINGS), dict(config.HARD_FLOORS)
     rows = []
     for k in list(dict.fromkeys([*effective, *ceilings, *floors])):
         v = effective.get(k)
@@ -402,7 +400,10 @@ def limits(r: Reader) -> dict:
             continue
         rows.append({"name": k, "value": num(v), "ceiling": num(ceilings.get(k)), "floor": num(floors.get(k))})
     syms = effective.get("symbols")
-    enabled, why = config.trading_enabled(r.root, {})
+    sw = config.switches(r.root, {})
+    enabled, why = not sw.halted, f"kill switch attivo: {sw.why}" if sw.halted else ""
+    if enabled and status in ("paused", "liquidating", "liquidated"):
+        enabled, why = False, notify.STATUS_WORD[status]
     return {"rows": rows, "symbols": [symbol(s) for s in syms] if isinstance(syms, (list, tuple)) else [],
             "trading_enabled": enabled, "kill_reason": why}
 
@@ -459,7 +460,7 @@ def load(root: Path, now: datetime | None = None) -> dict:
         "lessons": lessons(r),
         "param_changes": param_changes(journal),
         "params": params if isinstance(params, dict) else {},
-        "limits": limits(r),
+        "limits": limits(r, str(handoff.get("status") or "")),
         "problems": r.problems,
     }
     # The version changes only when the records do, so the page reloads only then.

@@ -38,8 +38,8 @@ Now: {{NOW}}
 
 ## Strategy entries and exploration, apart
 
-`regola`: buys that passed the strict entry rule. `esplorazione`: small buys (at most 1% of
-equity each, 5% in total) on shortlisted coins with a positive 4h trend that did **not** pass
+`regola`: buys that passed the strict entry rule. `esplorazione`: small buys (at most 1.5% of
+equity each, 15% in total) on shortlisted coins with a positive 4h trend that did **not** pass
 it, taken to collect outcomes. Read them apart. Exploration trades that do well repeatedly
 are evidence that the entry rule is too strict (for example `entry_threshold`); exploration
 trades that lose say the rule is right to wait. Say which one the numbers support, and how

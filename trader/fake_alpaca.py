@@ -48,6 +48,9 @@ class FakeAlpaca:
     def posts(self) -> int:
         return sum(1 for m, _ in self.calls if m == "POST")
 
+    def deletes(self) -> int:
+        return sum(1 for m, _ in self.calls if m == "DELETE")
+
     def symbol_of(self, key: str) -> str:
         return next(s for s in self.prices if norm_symbol(s) == key)
 
@@ -57,9 +60,9 @@ class FakeAlpaca:
         return self.cash + sum(q * self.prices[self.symbol_of(k)] for k, q in self.positions.items())
 
     def add_order(self, cid: str, symbol: str, side: str, notional: float | None = None,
-                  qty: float | None = None) -> dict:
+                  qty: float | None = None, created_at: str | None = None) -> dict:
         """Put an order into the account as if some earlier run had sent it."""
-        return self._accept({"symbol": symbol, "side": side, "client_order_id": cid,
+        return self._accept({"created_at": created_at, "symbol": symbol, "side": side, "client_order_id": cid,
                              "notional": None if notional is None else str(notional),
                              "qty": None if qty is None else str(qty), "type": "market", "time_in_force": "gtc"})
 
@@ -150,10 +153,19 @@ class FakeAlpaca:
             if self.post_fault == "lost_reply":
                 raise TransportError("TimeoutError: timed out")
             return self._ok(order)
+        if method == "DELETE" and path.startswith("/v2/orders/"):
+            oid = urllib.parse.unquote(path.removeprefix("/v2/orders/"))
+            for o in self.orders:
+                if o["id"] == oid:
+                    if o["status"] in ("filled", "canceled", "rejected", "expired"):
+                        return 422, json.dumps({"code": 42210000, "message": "order is not cancelable"})
+                    o["status"] = "canceled"
+                    return 204, ""
+            return 404, json.dumps({"code": 40410000, "message": "order not found"})
         return 404, json.dumps({"message": "not found"})
 
     def _accept(self, req: dict) -> dict:
-        now = self.now().isoformat()
+        now = req.get("created_at") or self.now().isoformat()
         o = {"id": str(uuid.uuid4()), "client_order_id": req["client_order_id"], "symbol": req["symbol"],
              "asset_class": "crypto", "side": req["side"], "type": req.get("type", "market"),
              "time_in_force": req.get("time_in_force", "gtc"), "notional": req.get("notional"),

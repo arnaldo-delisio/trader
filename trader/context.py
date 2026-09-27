@@ -11,8 +11,9 @@ from pathlib import Path
 
 from . import strategy as st
 from .broker import norm_symbol
-from .config import EXCLUDED_BASES, Limits, is_memecoin
+from .config import EXCLUDED_BASES, Limits, is_memecoin, is_position
 from .indicators import parse_bars, parse_time
+from .model import clean_text
 from .risk import Holding, Snapshot, daily_loss_pct
 
 
@@ -161,7 +162,7 @@ def track(positions: list[dict], stored: dict, m: Market, fills: list[dict], bid
         qty, value = f(p.get("qty_available", p.get("qty"))), f(p.get("market_value"))
         price = bids.get(s) or f(p.get("current_price"))
         if value < min_value or qty <= 0 or price <= 0:
-            if value >= 1.0:
+            if is_position(value):
                 notes.append(f"{s}: {value:.2f}$ sotto l'ordine minimo, uscita impossibile")
             continue
         fr, view = m.frames.get(s), m.views.get(s)
@@ -241,10 +242,13 @@ def render_prompt(template: str, *, slot: str, snap: Snapshot, m: Market, candid
            + (f", {regime.error}" if regime.error else ""))
     mk = (f"paniere 7g {m.basket_7d_pct:+.2f}% | crypto in tendenza 4h {m.breadth_pct:.0f}% | "
           f"filtro di mercato {'ok' if m.regime_ok else 'CHIUSO'}") if m.basket_7d_pct is not None else "dati insufficienti"
-    previous = {k: prev.get(k) for k in ("slot", "status", "market_view", "next_job")} if prev else None
+    # The previous handoff is text a model wrote: cleaned again, so junk written before the
+    # cleaning existed does not copy itself forward.
+    previous = ({k: clean_text(prev.get(k)) if k in ("market_view", "next_job") else prev.get(k)
+                 for k in ("slot", "status", "market_view", "next_job")} if prev else None)
     values = {
         "SLOT": slot,
-        "TRADING": "abilitato" if enabled else "DISABILITATO dal kill switch: ogni ordine sarà respinto",
+        "TRADING": "abilitato" if enabled else "acquisti DISABILITATI: ogni acquisto sarà respinto",
         "ACCOUNT": account, "REGIME": reg, "MARKET": mk,
         "CANDIDATES": "\n".join(cand) or "(nessuno)",
         "EXPLORE": "\n".join(expl) or "(nessuno)",

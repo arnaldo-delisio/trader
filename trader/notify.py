@@ -20,12 +20,14 @@ OUTCOME_WORD = {"placed": "inviato", "adopted": "già presente, adottato", "reje
                 "unconfirmed": "non confermato", "dry_run": "prova, non inviato"}
 STATUS_WORD = {"ok": "Completato", "no_trade": "Nessun ordine", "failed": "Errore",
                "killed": "Kill switch attivo", "already_done": "Slot già eseguito",
-               "stale_slot": "Slot vecchio, solo lettura"}
+               "stale_slot": "Slot vecchio, solo lettura", "paused": "Acquisti sospesi, uscite attive",
+               "liquidating": "Liquidazione in corso", "liquidated": "Liquidazione completata"}
 DRY_RUN_WORD = "PROVA"
 
 ACTION_ICON = {"buy": "🟢", "sell": "🔴", "hold": "⚪"}
 OUTCOME_ICON = {"placed": "📨", "adopted": "♻️", "rejected": "❌", "unconfirmed": "❓", "dry_run": "🧪"}
-STATUS_ICON = {"ok": "✅", "no_trade": "⏸️", "failed": "🚨", "killed": "🛑", "already_done": "♻️", "stale_slot": "⏪"}
+STATUS_ICON = {"ok": "✅", "no_trade": "⏸️", "failed": "🚨", "killed": "🛑", "already_done": "♻️", "stale_slot": "⏪",
+               "paused": "⏯️", "liquidating": "🧹", "liquidated": "🏁"}
 ACTION_IT = {k: f"{ACTION_ICON[k]} {w}" for k, w in ACTION_WORD.items()}
 OUTCOME_IT = {k: f"{OUTCOME_ICON[k]} {w}" for k, w in OUTCOME_WORD.items()}
 STATUS_IT = {k: f"{STATUS_ICON[k]} {w}" for k, w in STATUS_WORD.items()}
@@ -148,6 +150,8 @@ def wake_message(h: dict) -> str:
     if rows:
         lines.append("")
     lines += [_decision_line(d) for d in rows]
+    if h.get("liquidation"):
+        lines += ["", *liquidation_lines(h["liquidation"])]
     for w in h.get("alerts", []):
         lines.append(f"⚠️ {esc(w)}")
     if h.get("error"):
@@ -155,6 +159,23 @@ def wake_message(h: dict) -> str:
     if h.get("run_url"):
         lines.append(f'🔗 <a href="{esc(h["run_url"])}">Run su GitHub Actions</a>')
     return "\n".join(lines)
+
+
+def liquidation_lines(liq: dict) -> list[str]:
+    """The result of a liquidation: what is left, and the P&L since the start, realised
+    when nothing is left."""
+    out = []
+    if liq.get("left"):
+        out.append(f"⏳ Ancora da vendere: {esc(', '.join(liq['left']))} · il prossimo risveglio riprova")
+    else:
+        out.append("🏁 <b>Tutto venduto</b>: il conto è in liquidità")
+    word = "realizzato" if not liq.get("left") else "a valore di mercato"
+    out.append(f"💰 Patrimonio {esc(usd(liq.get('equity')))} · partenza {esc(usd(liq.get('baseline_equity')))}")
+    out.append(f"📊 Risultato {word}: <b>{esc(usd(liq.get('pnl_usd')))}</b> ({esc(pct(liq.get('pnl_pct')))})")
+    if liq.get("trades"):
+        out.append(f"🧾 Operazioni chiuse: {liq['trades']} · vinte {esc(pct(liq.get('win_rate_pct'), False))}"
+                   f" · commissioni {esc(usd(liq.get('fees_usd')))}")
+    return out
 
 
 def failure_message(slot: str, error: str, run_url: str = "") -> str:
@@ -216,6 +237,8 @@ def status_message(h: dict, baseline: float | None, today: list[dict], run_url: 
               f"dall'inizio {esc(pct(total))}")]
     if h.get("status") == "killed":
         lines.append("🛑 Kill switch attivo: nessun ordine, nemmeno le uscite")
+    elif h.get("status") == "paused":
+        lines.append("⏯️ Acquisti sospesi: stop e take-profit restano attivi")
     if m:
         gate_open = "aperto" if m.get("regime_ok") else "chiuso"
         lines.append(f"🌍 Paniere 7g {esc(pct(m.get('basket_7d_pct')))} · in tendenza "

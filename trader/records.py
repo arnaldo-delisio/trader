@@ -1,4 +1,4 @@
-"""The repo's records. Every write goes through Records._write, which strips secrets.
+"""The repo's records. Every write goes through Records.write, which strips secrets.
 
   state/progress.md        handoff for a human, newest entry on top
   state/last_handoff.json  the same handoff, for the next wake-up
@@ -17,6 +17,19 @@ from pathlib import Path
 
 MAX_PROGRESS_ENTRIES = 120
 ENTRY_MARK = "<!-- entry -->"
+PROGRESS_HEAD = "# Progress\n\nPassaggio di consegne tra un risveglio e il successivo. Il più recente in alto.\n\n"
+
+
+def prepend_entry(old: str, mark: str, head: str, entry: str, keep: int) -> str:
+    """A file of entries separated by `mark`, newest first: `entry` on top, at most `keep`."""
+    entries = old.split(mark)[1:] if mark in old else []
+    return head + "".join(mark + e for e in ([entry] + entries)[:keep])
+
+
+def alpaca_objects(rows, kind: str) -> list[dict]:
+    """The Alpaca objects of one kind ("order" or "fill") out of evidence rows."""
+    return [r["alpaca"] for r in rows if isinstance(r, dict) and r.get("kind") == kind
+            and isinstance(r.get("alpaca"), dict)]
 
 
 def redact(text: str, secrets: list[str]) -> str:
@@ -33,6 +46,10 @@ class Records:
         self.root = Path(root)
         self.secrets = secrets
         self.written: list[str] = []  # relative paths this run wrote, in order, for the trace
+
+    def write(self, rel: str, text: str, append: bool = False) -> None:
+        """Write (or append to) a record file under the root, secrets removed."""
+        self._write(rel, text, append)
 
     def _write(self, rel: str, text: str, append: bool = False) -> None:
         p = self.root / rel
@@ -51,7 +68,7 @@ class Records:
         self._write(rel, self._line({"kind": kind, "fetched_at": fetched_at.isoformat(),
                                      "note": note, "alpaca": raw}), append=True)
 
-    def _evidence_rows(self, days: int, now: datetime):
+    def evidence_rows(self, days: int, now: datetime):
         for i in range(days + 1):
             p = self.root / f"evidence/{(now - timedelta(days=i)):%Y-%m-%d}.jsonl"
             if p.exists():
@@ -61,12 +78,16 @@ class Records:
                     except ValueError:
                         continue
 
+    def alpaca(self, kind: str, days: int, now: datetime) -> list[dict]:
+        """Orders or fills of the last `days` exactly as Alpaca returned them."""
+        return alpaca_objects(self.evidence_rows(days, now), kind)
+
     def known_client_ids(self, now: datetime, days: int = 8) -> set[str]:
-        return {r["alpaca"].get("client_order_id") for r in self._evidence_rows(days, now)
+        return {r["alpaca"].get("client_order_id") for r in self.evidence_rows(days, now)
                 if r.get("kind") == "order" and isinstance(r.get("alpaca"), dict)}
 
     def known_fill_ids(self, now: datetime, days: int = 8) -> set[str]:
-        return {r["alpaca"].get("id") for r in self._evidence_rows(days, now)
+        return {r["alpaca"].get("id") for r in self.evidence_rows(days, now)
                 if r.get("kind") == "fill" and isinstance(r.get("alpaca"), dict)}
 
     # ---- journal --------------------------------------------------------
@@ -112,11 +133,8 @@ class Records:
 
     def _prepend_progress(self, entry: str) -> None:
         p = self.root / "state/progress.md"
-        head = "# Progress\n\nPassaggio di consegne tra un risveglio e il successivo. Il più recente in alto.\n\n"
         old = p.read_text(encoding="utf-8") if p.exists() else ""
-        entries = old.split(ENTRY_MARK)[1:] if ENTRY_MARK in old else []
-        entries = [entry] + entries[: MAX_PROGRESS_ENTRIES - 1]
-        self._write("state/progress.md", head + "".join(ENTRY_MARK + e for e in entries))
+        self._write("state/progress.md", prepend_entry(old, ENTRY_MARK, PROGRESS_HEAD, entry, MAX_PROGRESS_ENTRIES))
 
     # ---- small state files ---------------------------------------------
     def read_state(self, name: str) -> dict:

@@ -4,11 +4,11 @@ Jev (TypeSafe's classifier) answers one `choice` question: risk_on, neutral or
 risk_off. The answer only picks a size multiplier (MULTIPLIERS). It is never a
 go/no-go and never touches the hard limits: the gate applies those after sizing.
 
-Semantics mirror brain's bin/jev, with one difference: here nothing raises.
+Nothing here raises.
   - Jev unavailable (no key, network error, HTTP 429/529/5xx): try the Groq
     fallback, a plain chat call returning {"choice": ...}. The fallback has no
     probability distribution, so its answer is used as-is when the thresholds
-    file says `trust_fallback`, like bin/jev does.
+    file says `trust_fallback`.
   - HTTP 401/422 from Jev is our bug (bad key, bad question shape), not an
     outage: no fallback, the result is neutral and `error` says "bug".
   - Anything else (fallback down, bad JSON, unknown option, confidence below
@@ -37,7 +37,7 @@ from pathlib import Path
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
 JEV_MODEL = "jev-latest"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-# brain's bin/jev uses llama-3.1-8b-instant, which Groq answered 404 on 2026-09-26.
+# Not llama-3.1-8b-instant: Groq answered 404 for it on 2026-09-26.
 GROQ_MODEL = "openai/gpt-oss-20b"
 TIMEOUT = 10  # seconds per request; a wake has minutes, not hours
 

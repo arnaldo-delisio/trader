@@ -194,3 +194,28 @@ def test_exploration_positions_and_trades_are_labelled(tmp_path):
     m, html, _ = site(tmp_path, root)
     assert m["positions"][0]["explore"] is True and m["trades"][0]["explore"] is True
     assert html.count('class="tag explore"') == 2
+
+
+def test_invested_comes_from_the_handoffs_position_values(tmp_path):
+    # The handoff's rows say "value", not Alpaca's "market_value": the page showed 0% invested
+    # next to six open positions on 2026-09-27.
+    root = tmp_path / "repo"
+    (root / "state").mkdir(parents=True)
+    (root / "state/last_handoff.json").write_text(json.dumps({
+        "slot": "2026-09-26T11:45:00+00:00", "status": "no_trade", "equity": 10000.0,
+        "positions": [{"symbol": "BTC/USD", "value": 600.0, "stop": 1.0, "take_profit": 2.0, "entry_price": 1.5,
+                       "price": 1.6, "exit": None, "explore": False},
+                      {"symbol": "SOL/USD", "value": 400.0, "stop": 1.0, "take_profit": 2.0, "entry_price": 1.5,
+                       "price": 1.4, "exit": None, "explore": True}]}))
+    m = data.load(root, NOW)
+    assert m["account"]["invested_usd"] == 1000.0 and m["account"]["invested_pct"] == pytest.approx(10.0)
+    assert [p["market_value"] for p in m["positions"]] == [600.0, 400.0]
+
+
+def test_the_page_shows_buys_paused_from_the_handoff_status(tmp_path):
+    root = tmp_path / "repo"
+    (root / "state").mkdir(parents=True)
+    (root / "state/last_handoff.json").write_text(json.dumps({"slot": "2026-09-26T11:45:00+00:00",
+                                                              "status": "paused", "equity": 10000.0}))
+    lim = data.load(root, NOW)["limits"]
+    assert lim["trading_enabled"] is False and "Acquisti sospesi" in lim["kill_reason"]

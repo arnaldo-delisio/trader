@@ -10,7 +10,7 @@ import math
 from dataclasses import dataclass, field
 
 from .broker import norm_symbol
-from .config import EXIT_MIN_ORDER_USD, Limits
+from .config import EXIT_MIN_ORDER_USD, Limits, is_position
 from .model import Decision
 
 
@@ -63,8 +63,16 @@ def _floor(x: float, decimals: int = 9) -> float:
 
 
 def open_positions(s: Snapshot) -> int:
-    """Positions worth at least a dollar. Smaller ones are fee dust Alpaca leaves behind."""
-    return sum(1 for h in s.holdings.values() if h.market_value >= 1.0)
+    """Positions worth at least DUST_USD. Smaller ones are fee dust Alpaca leaves behind."""
+    return sum(1 for h in s.holdings.values() if is_position(h.market_value))
+
+
+def explore_exposure(s: Snapshot, explore_held: frozenset[str]) -> float:
+    """Dollars in exploration: the held exploration positions (norm_symbol in explore_held)
+    at market value, plus exploration buys still waiting to fill. The one implementation the
+    sizing (wake.py) and the gate both use against explore_total_pct."""
+    return (sum(h.market_value for k, h in s.holdings.items() if k in explore_held)
+            + sum(v for k, v in s.pending_buys.items() if k in explore_held))
 
 
 def exit_min_usd(s: Snapshot, symbol: str) -> float:
@@ -75,22 +83,23 @@ def exit_min_usd(s: Snapshot, symbol: str) -> float:
 
 
 def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool = True,
-         disabled_reason: str = "", entries: dict[str, float] | None = None,
+         disabled_reason: str = "", buys_enabled: bool = True, entries: dict[str, float] | None = None,
          explore: dict[str, float] | None = None, explore_held: frozenset[str] = frozenset()) -> list[Verdict]:
     """entries: the strategy's buy candidates this wake, symbol -> the most it may buy.
     explore: the exploration candidates, symbol -> the most it may buy; explore_held: the
     held symbols (norm_symbol) that were exploration buys. A buy of anything else is
     rejected, so the model can be more careful than the strategy, never more aggressive.
-    Sells only need something to sell."""
+    Sells only need something to sell.
+    enabled=False (the KILL file) rejects every order; buys_enabled=False (TRADING_ENABLED
+    off, or a liquidation) rejects buys only, so stops and take-profits still sell."""
     entries = entries or {}
     explore = explore or {}
     out: list[Verdict] = []
     cash = s.cash
     held_value = {k: h.market_value for k, h in s.holdings.items()}
     exposure = sum(held_value.values()) + sum(s.pending_buys.values())
-    explore_exposure = (sum(v for k, v in held_value.items() if k in explore_held)
-                        + sum(v for k, v in s.pending_buys.items() if k in explore_held))
-    positions = open_positions(s) + sum(1 for k in s.pending_buys if held_value.get(k, 0.0) < 1.0)
+    explored = explore_exposure(s, explore_held)
+    positions = open_positions(s) + sum(1 for k in s.pending_buys if not is_position(held_value.get(k, 0.0)))
     placed = 0
     loss = daily_loss_pct(s)
 
@@ -119,6 +128,10 @@ def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool =
             no(f"superato il massimo di {limits.max_orders_per_wake} ordini per risveglio")
             continue
 
+        if d.action == "buy" and not buys_enabled:
+            no(f"acquisti sospesi ({disabled_reason}): solo uscite")
+            continue
+
         if d.action == "buy":
             n = d.notional_usd
             ask = s.asks.get(d.symbol, 0.0)
@@ -134,13 +147,13 @@ def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool =
             elif d.symbol in entries and n > entries[d.symbol] + 0.01:
                 no(f"{n:.2f}$ oltre la dimensione della strategia ({entries[d.symbol]:.2f}$)")
             elif d.symbol not in entries and (why := _explore_no(d.symbol, n, s, limits, explore, held_value,
-                                                                 explore_exposure)):
+                                                                 explored)):
                 no(why)
             elif ask <= 0:
                 no("nessun prezzo ask disponibile")
             elif s.equity <= 0:
                 no("equity non disponibile")
-            elif held_value.get(key, 0.0) < 1.0 and positions >= limits.max_open_positions:
+            elif not is_position(held_value.get(key, 0.0)) and positions >= limits.max_open_positions:
                 no(f"già {positions} posizioni aperte, il massimo è {limits.max_open_positions}")
             elif held_value.get(key, 0.0) + n > s.equity * cap_pct / 100:
                 no(f"la posizione salirebbe a {held_value.get(key, 0.0) + n:.2f}$, oltre il {cap_pct:g}% "
@@ -155,9 +168,9 @@ def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool =
                 v.approved, v.reason = True, "ammesso"
                 v.order = {"symbol": d.symbol, "side": "buy", "notional": notional}
                 if v.explore:
-                    explore_exposure += notional
+                    explored += notional
                 cash -= notional
-                if held_value.get(key, 0.0) < 1.0:
+                if not is_position(held_value.get(key, 0.0)):
                     positions += 1
                 held_value[key] = held_value.get(key, 0.0) + notional
                 exposure += notional
@@ -196,19 +209,19 @@ def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool =
 
 
 def _explore_no(symbol: str, n: float, s: Snapshot, limits: Limits, explore: dict[str, float],
-                held_value: dict[str, float], explore_exposure: float) -> str:
+                held_value: dict[str, float], explored: float) -> str:
     """Why an exploration buy is refused, or "" when its own caps allow it. The usual caps
     (per coin, invested, positions, cash) are checked after this, as for every buy."""
     key = norm_symbol(symbol)
     one, total = s.equity * limits.explore_position_pct / 100, s.equity * limits.explore_total_pct / 100
     if n > explore[symbol] + 0.01:
         return f"esplorazione: {n:.2f}$ oltre la dimensione ammessa ({explore[symbol]:.2f}$)"
-    if held_value.get(key, 0.0) >= 1.0:
+    if is_position(held_value.get(key, 0.0)):
         return "esplorazione: solo posizioni nuove, questa crypto è già in portafoglio"
     if n > one + 1e-9:
         return (f"esplorazione: {n:.2f}$ oltre l'{limits.explore_position_pct:g}% del patrimonio "
                 f"per posizione ({one:.2f}$)")
-    if explore_exposure + n > total + 1e-9:
-        return (f"esplorazione: il totale salirebbe a {explore_exposure + n:.2f}$, oltre il "
+    if explored + n > total + 1e-9:
+        return (f"esplorazione: il totale salirebbe a {explored + n:.2f}$, oltre il "
                 f"{limits.explore_total_pct:g}% del patrimonio ({total:.2f}$)")
     return ""

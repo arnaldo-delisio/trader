@@ -14,9 +14,10 @@ Order inside a wake:
 from __future__ import annotations
 
 import sys
+import time
 import traceback
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -30,13 +31,16 @@ from .config import (
     ORDER_PREFIX,
     ConfigError,
     Limits,
+    Switches,
     is_memecoin,
-    trading_enabled,
+    is_position,
+    switches,
 )
+from .indicators import parse_time
 from .model import Decision, Proposal
 from .orders import OPEN_STATUSES, place, slot_prefix
 from .records import Records
-from .risk import gate, open_positions
+from .risk import explore_exposure, gate, open_positions
 from .slot import (
     cadence_bucket,
     is_last_slot_of_day,
@@ -48,6 +52,13 @@ from .trace import RED, YELLOW, Trace
 
 HISTORY_DAYS = 10     # 15m bars per wake: the 4h indicators need about 9 days to warm up
 REFLECT_DAYS = 14     # the walk-forward window of the reflection's backtest
+# An order of ours still open after this long is cancelled at the start of the next wake. A
+# crypto market order normally fills in seconds; on paper, POL/USD and RENDER/USD buys sat
+# unfilled for hours on 2026-09-27, and an open order blocks every new order on its symbol,
+# a stop's sell included. An exit is then placed again by the same wake, with this slot's id.
+STALE_ORDER_MINUTES = 20
+# After a liquidation's sells, how long to wait for them to fill before reporting.
+LIQUIDATION_WAIT_S = 30
 EXIT_WORD = {"stop": "stop", "take_profit": "take-profit", "tempo": "tenuta massima",
              "segnale": "segnale in calo"}
 
@@ -67,6 +78,7 @@ class Deps:
     reflect: bool | None = None       # None: once per 6-hour bucket; True: now; False: never
     always_ask: bool = False          # ask the model even without buy candidates (local checks)
     judge: Callable | None = None  # (alpaca, symbols, spreads, deps, now) -> judge(current, candidate)
+    sleep: Callable[[float], None] = time.sleep  # waiting for a liquidation's fills
 
 
 def wake(deps: Deps, slot: datetime, dry_run: bool = False) -> int:
@@ -98,7 +110,8 @@ def wake(deps: Deps, slot: datetime, dry_run: bool = False) -> int:
     finally:
         h["finished_at"] = deps.now().isoformat()
         _finish(deps, slot, h, journal, trace, ctx)
-    if code == 0 and ctx.get("alpaca") and h["status"] not in ("already_done", "stale_slot"):
+    if code == 0 and ctx.get("alpaca") and h["status"] not in ("already_done", "stale_slot", "liquidated",
+                                                                 "liquidating"):
         try:
             _maybe_reflect(deps, slot, h, trace, ctx)
         except Exception as e:  # noqa: BLE001 - a reflection never fails the wake
@@ -124,11 +137,17 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     alpaca, model = deps.build()
     ctx["alpaca"], ctx["model"] = alpaca, model
     journal["model"] = getattr(model, "name", type(model).__name__)
+    sw = switches(deps.root, deps.env)
+    enabled, why = not sw.halted, sw.why
 
-    # 1. Alpaca, the source of truth
+    # 1. Alpaca, the source of truth. Our orders stuck open go first: they would block
+    # every new order on their symbol, an exit included.
+    open_orders = alpaca.orders("open")
+    if _cancel_orders(alpaca, open_orders, now, dry_run, rec, h, journal, trace, sw,
+                      everything=sw.liquidate):
+        open_orders = alpaca.orders("open")
     account = alpaca.account()
     positions = alpaca.positions()
-    open_orders = alpaca.orders("open")
     recent = alpaca.orders("all", after=(now - timedelta(days=7)).isoformat())
     fills = alpaca.fills(after=(now - timedelta(days=8)).isoformat())
 
@@ -149,7 +168,6 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     journal["recovered_orders"] = [o["client_order_id"] for o in recovered]
     journal["new_fills"] = len(new_fills)
 
-    enabled, why = trading_enabled(deps.root, deps.env)
     assets = alpaca.assets()
     symbols, gone = context.universe(assets, limits)
     held_syms = sorted({context.pair(p["symbol"]) for p in positions if p.get("asset_class", "crypto") == "crypto"})
@@ -169,8 +187,10 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     trace.context(snap, positions, open_orders, len(new_fills))
     trace.reconcile(journal["recovered_orders"])
     trace.universe(len(symbols), gone)
-    if not enabled:
+    if sw.halted:
         trace.step("kill switch", f"attivo ({why}): ogni ordine sarà respinto", RED)
+    elif not sw.buys:
+        trace.step("interruttore", why, YELLOW)
 
     slot_orders = [cid for cid in ours if cid.startswith(slot_prefix(slot))]
     same_slot_done = (prev and prev.get("slot") == slot.isoformat() and not prev.get("dry_run")
@@ -183,6 +203,10 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
         journal["skipped"] = h["outcome"]
         trace.step("sola lettura", h["outcome"], YELLOW)
         _summarise_state(h, snap, alpaca, prev)
+        return
+    if sw.liquidate:
+        _liquidate(deps, slot, dry_run, h, journal, trace, alpaca, snap, positions, open_orders, quotes, assets, sw)
+        _summarise_state(h, ctx["snap"], alpaca, prev)
         return
 
     # 2. market: indicators and scores for the whole universe
@@ -223,7 +247,7 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
 
     # 4. buy candidates: the strategy's rule, sized, capped like the gate will cap them
     cool = context.cooldowns(recent, params)
-    held_keys = {k for k, x in snap.holdings.items() if x.market_value >= 1.0}
+    held_keys = {k for k, x in snap.holdings.items() if is_position(x.market_value)}
     ranked = sorted((v for v in m.views.values() if v.entry), key=lambda v: v.score, reverse=True)
     eligible = [v for v in ranked if v.symbol.replace("/", "") not in held_keys
                 and cool.get(v.symbol, 0) <= t and v.symbol.replace("/", "") not in snap.open_order_symbols]
@@ -237,9 +261,7 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     explore_held = frozenset(s.replace("/", "") for s, p in tracked.items() if p.levels.get("explore")) | frozenset(
         s.replace("/", "") for s, lv in stored.items()
         if isinstance(lv, dict) and lv.get("explore") and s.replace("/", "") in snap.pending_buys)
-    explore_room = min(snap.equity * limits.explore_total_pct / 100
-                       - sum(p.value for s, p in tracked.items() if p.levels.get("explore"))
-                       - sum(v for k, v in snap.pending_buys.items() if k in explore_held),
+    explore_room = min(snap.equity * limits.explore_total_pct / 100 - explore_exposure(snap, explore_held),
                        snap.equity * limits.explore_position_pct / 100)
     explorable = [m.views[s] for s in shortlist if s in m.views and st.explore_ok(m.views[s], params)[0]
                   and s.replace("/", "") not in held_keys and cool.get(s, 0) <= t
@@ -247,7 +269,7 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     regime = None
     entries: dict[str, float] = {}
     explore: dict[str, float] = {}
-    if (eligible or explorable) and not enabled:
+    if (eligible or explorable) and not sw.buys:
         # nothing may be bought: ask nobody
         journal["blocked_candidates"] = [v.symbol for v in eligible + explorable]
     elif eligible or explorable:
@@ -256,7 +278,7 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
         if regime.error.startswith("bug"):
             _alert(h, f"Jev: {regime.error}")
         entries = _size(eligible, snap, limits, params, regime.multiplier)
-        explore = _size_explore(explorable, snap, limits, regime.multiplier, entries, tracked, explore_held)
+        explore = _size_explore(explorable, snap, limits, regime.multiplier, entries, explore_held)
     ctx["regime"] = regime
     h["regime"] = regime.regime if regime else None
     journal["candidates"] = entries
@@ -275,7 +297,7 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
             regime=regime or jev.Regime("neutral", jev.multiplier_for("neutral"), "none", None, None, None, 0,
                                         "non interpellato"),
             trades=_recent_trades(fills, recent, rec, now), lessons=learn.recent_lessons(deps.root, 2),
-            prev=prev, enabled=enabled)
+            prev=prev, enabled=sw.buys)
         try:
             proposal = model.propose(prompt)
         except Exception as e:  # noqa: BLE001 - adapters should not raise; if one does, hold
@@ -297,7 +319,8 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
                          if d.symbol not in exiting]
 
     # 6. deterministic gate, then orders
-    verdicts = gate(decisions, snap, limits, enabled=enabled, disabled_reason=why, entries=entries,
+    verdicts = gate(decisions, snap, limits, enabled=enabled, disabled_reason=why, buys_enabled=sw.buys,
+                    entries=entries,
                     explore=explore, explore_held=explore_held)
     rows, new_levels, exit_rows = [], {}, []
     for v, d in zip(verdicts, decisions):
@@ -346,13 +369,16 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
                       for s, p in tracked.items()]
 
     acted = [r for r in rows if r.get("outcome") in ("placed", "adopted", "dry_run")]
-    if not enabled:
+    if sw.halted:
         h["status"] = "killed"
         h["outcome"] = f"kill switch attivo ({why}): nessun ordine"
     elif acted:
         h["status"] = "ok"
         h["outcome"] = "; ".join(f"{notify.ACTION_WORD[r['action']]} {r['symbol']}: "
                                  f"{notify.OUTCOME_WORD[r['outcome']]}" for r in acted)
+    elif not sw.buys:
+        h["status"] = "paused"
+        h["outcome"] = f"acquisti sospesi ({why}); nessuna uscita da fare"
     else:
         h["status"] = "no_trade"
         h["outcome"] = "nessun ordine: " + (
@@ -364,6 +390,122 @@ def _run(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trac
     h["next_job"] = (proposal.next_job if proposal and proposal.valid and proposal.next_job
                      else "ricontrollare stop e candidati con le nuove barre")
     _summarise_state(h, snap, alpaca, prev)
+
+
+def _cancel_orders(alpaca: Alpaca, open_orders: list[dict], now: datetime, dry_run: bool, rec: Records,
+                   h: dict, journal: dict, trace: Trace, sw: Switches, everything: bool = False) -> bool:
+    """Cancel our (trd-) orders open for STALE_ORDER_MINUTES or more; with everything=True
+    (a liquidation) every open order, whatever its age or owner. Journals each one and alerts.
+    The KILL file cancels nothing, a dry run only says what it would cancel.
+    Returns True when at least one cancel went through."""
+    todo = []
+    for o in open_orders:
+        cid = str(o.get("client_order_id", ""))
+        if o.get("status", "new") not in OPEN_STATUSES or o.get("status") == "pending_cancel":
+            continue
+        try:
+            age = (now.timestamp() - parse_time(str(o.get("submitted_at") or o.get("created_at")))) / 60
+        except (TypeError, ValueError):
+            age = float("inf")  # no readable time: treat it as stuck
+        if everything or (cid.startswith(ORDER_PREFIX) and age >= STALE_ORDER_MINUTES):
+            todo.append((o, age))
+    rows, any_done = [], False
+    for o, age in todo:
+        cid = o.get("client_order_id", "")
+        what = f"{cid or o.get('id')} ({o.get('side')} {o.get('symbol')}, aperto da {age:.0f} min)"
+        if sw.halted:
+            outcome, detail = "kept", "kill switch: nessun annullamento"
+        elif dry_run:
+            outcome, detail = "dry_run", "prova: non annullato"
+        else:
+            try:
+                alpaca.cancel_order(o["id"])
+                outcome, detail, any_done = "canceled", "annullato", True
+                rec.evidence("order", o, now, note=f"annullato dal risveglio: aperto da {age:.0f} minuti")
+            except (BrokerUnavailable, BrokerHTTPError) as e:
+                outcome, detail = "failed", f"annullamento non riuscito: {e}"[:200]
+        rows.append({"client_order_id": cid, "id": o.get("id"), "symbol": o.get("symbol"), "side": o.get("side"),
+                     "age_min": round(age, 1) if age != float("inf") else None, "outcome": outcome,
+                     "detail": detail})
+        _alert(h, f"ordine {what}: {detail}")
+    if rows:
+        journal["canceled_orders"] = rows
+        trace.step("ordini fermi", "; ".join(f"{r['client_order_id']} {r['detail']}" for r in rows), YELLOW)
+    return any_done
+
+
+def _liquidate(deps: Deps, slot: datetime, dry_run: bool, h: dict, journal: dict, trace: Trace,
+               alpaca: Alpaca, snap, positions: list[dict], open_orders: list[dict], quotes: dict,
+               assets: list[dict], sw: Switches) -> None:
+    """LIQUIDATE=true: sell every position whole, at market, then report the realised P&L.
+    The open orders were cancelled at the start of the wake. Each sell still goes through
+    the gate (nothing is shorted, Alpaca's minimum holds); only the per-wake order count is
+    lifted to the number of positions, since every one of these orders reduces risk."""
+    rec = deps.records
+    sells = [Decision(context.pair(k), "sell", round(x.qty_available * snap.bids.get(context.pair(k), 0.0), 2),
+                      "liquidazione: vendita di tutta la posizione")
+             for k, x in sorted(snap.holdings.items()) if is_position(x.market_value)]
+    limits = replace(deps.limits, max_orders_per_wake=max(deps.limits.max_orders_per_wake, len(sells)))
+    verdicts = gate(sells, snap, limits, enabled=True, disabled_reason=sw.why, buys_enabled=False)
+    rows = []
+    for v, d in zip(verdicts, sells):
+        row = {**v.as_dict(), "reason_model": d.reason, "auto": True, "exit": "liquidazione"}
+        trace.verdict(row)
+        if v.approved:
+            p = place(alpaca, slot, v.order, open_orders, dry_run=dry_run)
+            row.update(outcome=p.outcome, client_order_id=p.client_order_id, detail=p.detail)
+            trace.order(row)
+            if p.order:
+                rec.evidence("order", p.order, deps.now(), note=f"liquidazione: {p.outcome}")
+            if p.outcome in ("unconfirmed", "rejected"):
+                _alert(h, f"{p.client_order_id}: {p.detail}")
+        else:
+            _alert(h, f"liquidazione di {v.symbol} respinta: {v.reason}")
+        rows.append(row)
+    h["decisions"] = journal["verdicts"] = rows
+    journal["exits"] = [{"client_order_id": r["client_order_id"], "symbol": r["symbol"], "reason": "liquidazione"}
+                        for r in rows if r.get("outcome") in ("placed", "adopted", "dry_run")]
+
+    # wait for the fills, then read the account again: the report is about cash, not quotes
+    left = [r["symbol"] for r in rows if r.get("outcome") in ("placed", "adopted")]
+    for attempt in range(LIQUIDATION_WAIT_S // 3 + 1):
+        if attempt:
+            deps.sleep(3)
+        account, held = alpaca.account(), alpaca.positions()
+        snap = context.snapshot(account, held, alpaca.orders("open"), quotes, assets)
+        left = sorted(context.pair(k) for k, x in snap.holdings.items() if is_position(x.market_value))
+        if dry_run or not left:
+            break
+    cad = rec.read_state("cadence")
+    baseline = cad.get("baseline_equity")
+    liq = {"sold": [r["symbol"] for r in rows if r.get("outcome") in ("placed", "adopted", "dry_run")],
+           "left": left, "flat": not left and not snap.pending_buys, "equity": snap.equity, "cash": snap.cash,
+           "baseline_equity": baseline, "reported": bool(cad.get("liquidation_reported")),
+           "pnl_usd": snap.equity - baseline if baseline else None,
+           "pnl_pct": (snap.equity / baseline - 1) * 100 if baseline else None}
+    liq.update(_closed_summary(alpaca, rec, deps.now(), cad.get("baseline_at")))
+    h["liquidation"] = journal["liquidation"] = liq
+    h["equity"] = journal["equity"] = snap.equity
+    h["status"] = "liquidated" if liq["flat"] else "liquidating"
+    h["outcome"] = (f"liquidazione: vendute {len(liq['sold'])} posizioni" if liq["sold"] else "liquidazione: niente da vendere") + (
+        f"; restano {', '.join(left)}, il prossimo risveglio riprova" if left else "; tutto in liquidità")
+    h["changed"] = ", ".join(f"{r['client_order_id']} ({r['outcome']})" for r in rows if r.get("outcome")) or "niente"
+    h["next_job"] = ("riprovare la vendita di " + ", ".join(left)) if left else "niente: conto in liquidità"
+    trace.step("liquidazione", h["outcome"], YELLOW if left else None)
+
+
+def _closed_summary(alpaca: Alpaca, rec: Records, now: datetime, since: str | None) -> dict:
+    """The agent's closed trades since the start, net of fees, for the final report."""
+    try:
+        after = since or (now - timedelta(days=30)).isoformat()
+        orders = alpaca.orders("all", after=after)
+        trades = learn.closed_trades(ours(alpaca.fills(after=after), orders), orders,
+                                     rec.journal_since(after[:10]))
+    except Exception:  # noqa: BLE001 - the report can do without the list
+        return {}
+    s = learn.summarize(trades)
+    return {"trades": s.get("trades", 0), "win_rate_pct": s.get("win_rate_pct"),
+            "trades_pnl_usd": s.get("pnl_usd"), "fees_usd": s.get("fees_usd")}
 
 
 def _classify(deps: Deps, state: dict):
@@ -400,7 +542,7 @@ def _relabel_exploration(tracked: dict, orders: list[dict], rec: Records, now: d
     if not lost:
         return
     try:
-        _, _, explore_ids = learn._journal_index(rec.journal_since(f"{now - timedelta(days=8):%Y-%m-%d}"))
+        _, _, explore_ids = learn.journal_index(rec.journal_since(f"{now - timedelta(days=8):%Y-%m-%d}"))
     except Exception:  # noqa: BLE001 - without the journal the label stays lost; the hard caps still hold
         return
     for s in lost:
@@ -412,7 +554,7 @@ def _relabel_exploration(tracked: dict, orders: list[dict], rec: Records, now: d
 
 
 def _size_explore(explorable: list, snap, limits: Limits, regime_mult: float, entries: dict[str, float],
-                  tracked: dict, explore_held: frozenset[str]) -> dict[str, float]:
+                  explore_held: frozenset[str]) -> dict[str, float]:
     """The most each exploration candidate may buy, best score first: explore_position_pct of
     equity scaled by the regime, within what is left of explore_total_pct and of the usual caps,
     after the strategy's own entries. The gate checks every cap again."""
@@ -420,9 +562,7 @@ def _size_explore(explorable: list, snap, limits: Limits, regime_mult: float, en
     invested = (sum(x.market_value for x in snap.holdings.values()) + sum(snap.pending_buys.values())
                 + sum(entries.values()))
     cash, n_pos = snap.cash - sum(entries.values()), open_positions(snap) + len(entries)
-    budget = snap.equity * limits.explore_total_pct / 100 - sum(
-        p.value for s, p in tracked.items() if s.replace("/", "") in explore_held) - sum(
-        v for k, v in snap.pending_buys.items() if k in explore_held)
+    budget = snap.equity * limits.explore_total_pct / 100 - explore_exposure(snap, explore_held)
     out = {}
     for v in explorable[: max(0, limits.max_orders_per_wake - len(entries))]:
         want = min(snap.equity * limits.explore_position_pct / 100 * regime_mult, budget)
@@ -477,6 +617,10 @@ def _check_continuity(prev: dict | None, slot: datetime, h: dict, journal: dict)
                              "nessun recupero")
     if prev.get("status") == "failed":
         h["warnings"].append(f"il risveglio precedente era fallito: {prev.get('error', '')[:120]}")
+    if prev.get("notified") is False and not prev.get("dry_run"):
+        # Its message never reached Telegram: say so, with the gist of what it said.
+        _alert(h, f"il messaggio del risveglio {prev.get('slot_id', '')} non è arrivato "
+                  f"({str(prev.get('notify_detail', ''))[:80]}); in breve: {str(prev.get('outcome', ''))[:200]}")
     return False
 
 
@@ -486,7 +630,7 @@ def _summarise_state(h: dict, snap, alpaca: Alpaca, prev: dict | None) -> None:
     except (BrokerUnavailable, BrokerHTTPError):
         open_now = None
     exposure = sum(x.market_value for x in snap.holdings.values())
-    held = ", ".join(sorted(k for k, x in snap.holdings.items() if x.market_value >= 1.0)) or "nessuna"
+    held = ", ".join(sorted(k for k, x in snap.holdings.items() if is_position(x.market_value))) or "nessuna"
     h["remaining_risk"] = (f"investito {exposure:.2f}$ (prima degli ordini di questo slot) su {held}; "
                            + (f"{len(open_now)} ordini aperti" if open_now is not None else "ordini aperti non verificati"))
     if h["status"] in ("already_done", "stale_slot") and prev:
@@ -495,8 +639,10 @@ def _summarise_state(h: dict, snap, alpaca: Alpaca, prev: dict | None) -> None:
 
 def notable(h: dict) -> bool:
     """A wake worth a message: a trade or a rejected order, a failure, an alert. Quiet otherwise."""
+    liq = h.get("liquidation")
     return (h["status"] == "failed" or bool(h.get("alerts"))
-            or any(d.get("action") != "hold" for d in h.get("decisions", [])))
+            or any(d.get("action") != "hold" for d in h.get("decisions", []))
+            or bool(liq and liq.get("flat") and not liq.get("reported")))
 
 
 def _finish(deps: Deps, slot: datetime, h: dict, journal: dict, trace: Trace, ctx: dict) -> None:
@@ -526,6 +672,8 @@ def _finish(deps: Deps, slot: datetime, h: dict, journal: dict, trace: Trace, ct
     else:
         ok, detail = True, "risveglio tranquillo: nessun messaggio"
         trace.step("telegram", detail)
+    if ok and not h["dry_run"] and (h.get("liquidation") or {}).get("flat"):
+        rec.update_state("cadence", liquidation_reported=h["slot_id"])  # the final report goes out once
     try:
         rec.update_handoff(notified=ok, notify_detail=detail)
     except Exception as e:  # noqa: BLE001
@@ -626,9 +774,7 @@ def _daily_summary(deps: Deps, slot: datetime, h: dict, trace: Trace, baseline, 
         since = (now - timedelta(days=9)).isoformat()
         fills, orders = alpaca.fills(after=since), alpaca.orders("all", after=since)
     except (AttributeError, BrokerUnavailable, BrokerHTTPError):
-        ev = list(rec._evidence_rows(9, now))
-        fills = [r["alpaca"] for r in ev if r.get("kind") == "fill" and isinstance(r.get("alpaca"), dict)]
-        orders = [r["alpaca"] for r in ev if r.get("kind") == "order" and isinstance(r.get("alpaca"), dict)]
+        fills, orders = rec.alpaca("fill", 9, now), rec.alpaca("order", 9, now)
     journal = rec.journal_since(f"{now - timedelta(days=9):%Y-%m-%d}")
     closed = [t for t in learn.closed_trades(ours(fills, orders), orders, journal) if t.exit_time[:10] == day]
     start_equity = next((w["equity"] for w in wakes if w.get("equity")), None)

@@ -36,7 +36,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from . import strategy as st
+from .config import ORDER_PREFIX
 from .model import ModelError
+from .records import prepend_entry
 
 # ---- what the reflection may change, and by how much ------------------------
 # One table for the whole repo: strategy.PARAM_BOUNDS (name -> lowest, highest, largest
@@ -169,10 +171,10 @@ def _hours(a: str, b: str) -> float:
         return 0.0
 
 
-CID_RE = re.compile(r"^trd-(?P<slot>[0-9]{8}T[0-9]{4}Z)-(?P<sym>[A-Z0-9]+)-(?P<side>buy|sell)$")
+CID_RE = re.compile("^" + re.escape(ORDER_PREFIX) + r"(?P<slot>[0-9]{8}T[0-9]{4}Z)-(?P<sym>[A-Z0-9]+)-(?P<side>buy|sell)$")
 
 
-def _journal_index(journal: list[dict]) -> tuple[dict, dict, set]:
+def journal_index(journal: list[dict]) -> tuple[dict, dict, set]:
     """(slot -> {symbol: signals}, client_order_id -> exit reason, exploration buy ids)."""
     signals, reasons, explore = {}, {}, set()
     for row in journal:
@@ -202,7 +204,7 @@ def closed_trades(fills: list[dict], orders: list[dict], journal: list[dict],
     A sell with nothing open before it (its buy is older than the window) is skipped.
     """
     cid_of = {o.get("id"): o.get("client_order_id", "") for o in orders if isinstance(o, dict)}
-    signals, reasons, explore = _journal_index(journal)
+    signals, reasons, explore = journal_index(journal)
     seen, rows = set(), []
     for f in fills:
         if not isinstance(f, dict) or f.get("id") in seen or f.get("side") not in ("buy", "sell"):
@@ -418,22 +420,16 @@ def ask_model(model, prompt: str):
 
 
 # ---- records -------------------------------------------------------------------------
-def load_params(root: Path) -> dict:
-    return json.loads((Path(root) / PARAMS_FILE).read_text(encoding="utf-8"))
-
-
 def write_params(records, params: dict) -> None:
-    records._write(PARAMS_FILE, json.dumps(params, indent=2, sort_keys=True) + "\n")
+    records.write(PARAMS_FILE, json.dumps(params, indent=2, sort_keys=True) + "\n")
 
 
 def write_lessons(records, lessons: list[str], slot: str, now: datetime) -> None:
     p = Path(records.root) / LESSONS_FILE
     old = p.read_text(encoding="utf-8") if p.exists() else ""
-    entries = old.split(ENTRY_MARK)[1:] if ENTRY_MARK in old else []
     entry = f"\n## {now.astimezone(UTC):%Y-%m-%d %H:%M} UTC · slot {slot}\n\n" + \
         "".join(f"- {x}\n" for x in lessons)
-    entries = [entry] + entries[: MAX_LESSON_ENTRIES - 1]
-    records._write(LESSONS_FILE, LESSONS_HEAD + "".join(ENTRY_MARK + e for e in entries))
+    records.write(LESSONS_FILE, prepend_entry(old, ENTRY_MARK, LESSONS_HEAD, entry, MAX_LESSON_ENTRIES))
 
 
 def recent_lessons(root: Path, entries: int = 3) -> str:
@@ -495,12 +491,10 @@ def run_reflection(*, root: Path, records, model, judge, now: datetime, slot: st
     rec = {"kind": "reflection", "slot": slot, "at": now.isoformat(), "lessons": [], "accepted": [],
            "rejected": [], "params_written": False, "error": ""}
     try:
-        params = load_params(root) if params is None else params
+        params = st.load_params(Path(root) / PARAMS_FILE) if params is None else params
         journal = _journal_rows(records, now, days)
         if fills is None or orders is None:
-            ev = list(records._evidence_rows(days, now))
-            fills = [r["alpaca"] for r in ev if r.get("kind") == "fill" and isinstance(r.get("alpaca"), dict)]
-            orders = [r["alpaca"] for r in ev if r.get("kind") == "order" and isinstance(r.get("alpaca"), dict)]
+            fills, orders = records.alpaca("fill", days, now), records.alpaca("order", days, now)
         trades = closed_trades(fills, orders, journal, fee_pct)
         rec["summary"], rec["attribution"] = summarize(trades), attribution(trades)
         rec["summary_by_kind"] = summary_by_kind(trades)

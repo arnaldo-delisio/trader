@@ -13,13 +13,13 @@ symbols = [
 max_invested_pct = 60.0      # % del patrimonio investito in crypto, al massimo
 max_position_pct = 8.0       # % del patrimonio in una sola crypto
 max_memecoin_pct = 3.0       # % del patrimonio in una sola memecoin
-max_open_positions = 10      # posizioni aperte al massimo
+max_open_positions = 25      # posizioni aperte al massimo (gli ordini d'acquisto non eseguiti contano)
 max_orders_per_wake = 3      # ordini al massimo per risveglio (uscite comprese)
 daily_loss_limit_pct = 5.0   # oltre questa perdita dalla chiusura precedente: niente acquisti, vendite ammesse
 min_order_usd = 10.0         # sotto questo importo l'ordine non parte
 
 # Esplorazione: piccoli acquisti sotto la soglia d'ingresso, su crypto della lista corta in
 # tendenza positiva sul 4h, per avere operazioni da cui la riflessione possa imparare.
-# Tetti nel codice: 1% per posizione, 5% in totale. 0 la spegne.
-explore_position_pct = 1.0   # % del patrimonio per un acquisto di esplorazione
-explore_total_pct = 5.0      # % del patrimonio in tutte le posizioni di esplorazione insieme
+# Tetti nel codice: 1,5% per posizione, 15% in totale. 0 la spegne.
+explore_position_pct = 1.5   # % del patrimonio per un acquisto di esplorazione
+explore_total_pct = 15.0     # % del patrimonio in tutte le posizioni di esplorazione insieme

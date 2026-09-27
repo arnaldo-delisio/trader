@@ -16,6 +16,7 @@ from .data import parse_time
 
 STATUS_WORD = {**notify.STATUS_WORD, "reflection": "Riflessione", "unknown": "Sconosciuto"}
 STATUS_TONE = {"ok": "good", "no_trade": "calm", "failed": "bad", "killed": "warn", "already_done": "dim",
+               "paused": "warn", "liquidating": "warn", "liquidated": "calm",
                "stale_slot": "dim", "reflection": "violet", "unknown": "dim"}
 REGIME_WORD = {"risk_on": "Propenso al rischio", "neutral": "Neutrale", "risk_off": "Avverso al rischio"}
 REGIME_TONE = {"risk_on": "good", "neutral": "calm", "risk_off": "bad"}
@@ -385,7 +386,7 @@ def limits_block(lim: dict, params: dict) -> str:
 
         hard_txt = f'<small>{word} nel codice {amount(hard, unit)}</small>' if hard is not None and word else ""
         rows.append(f'<li><span class="lname">{e(label)}</span><span class="lval">{amount(v, unit)}{hard_txt}</span></li>')
-    kill = (pill("kill switch attivo: " + lim["kill_reason"], "bad") if not lim["trading_enabled"]
+    kill = (pill(lim["kill_reason"], "bad") if not lim["trading_enabled"]
             else pill("kill switch spento", "good"))
     syms = lim["symbols"]
     sym_txt = (f'<p class="syms"><b>{len(syms)}</b> simboli ammessi: '
@@ -423,7 +424,9 @@ def page(m: dict) -> str:
               if last else pill("in attesa del primo risveglio", "dim"))
     regime_pill = (pill(f"Jev: {REGIME_WORD.get(reg['regime'], reg['regime'])} ×{fnum(reg['multiplier'], 1)}",
                         REGIME_TONE.get(reg["regime"], "calm")) if reg else pill("Jev: nessun dato", "dim"))
-    kill_pill = "" if m["limits"]["trading_enabled"] else pill("KILL SWITCH", "bad")
+    kill_pill = ("" if m["limits"]["trading_enabled"] else
+                 pill("KILL SWITCH", "bad") if m["limits"]["kill_reason"].startswith("kill") else
+                 pill(m["limits"]["kill_reason"], "warn"))
 
     base = m["equity_series"][0]["equity"] if m["equity_series"] else None
     inv_bar = ""

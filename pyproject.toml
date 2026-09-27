@@ -3,6 +3,7 @@ name = "trader"
 version = "0.1.0"
 description = "Agente autonomo di trading crypto su Alpaca paper, svegliato da GitHub Actions."
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = []
 
 [dependency-groups]

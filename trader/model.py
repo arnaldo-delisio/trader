@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import subprocess
 import tempfile
 import urllib.error
@@ -83,10 +84,23 @@ class InvalidProposal(ValueError):
     pass
 
 
+# Tag-like text such as "</next_job>" or "</invoke>": a model sometimes echoes the markup
+# of its own tool call into a field. On 2026-09-27 from 00:30 UTC every next_job ended in
+# "</next_job>\n</invoke>", and PREVIOUS.next_job fed it back into the next prompt.
+# A tag here is "<", an optional "/", a letter, a name and optional quoted attributes up
+# to ">", so comparisons such as "RSI < 30" or "score <0,8" survive.
+TAG_RE = re.compile(r"""</?[A-Za-z][\w:.-]*(?:\s+[\w:.-]+(?:=(?:"[^"<>]*"|'[^'<>]*'))?)*\s*/?>""")
+
+
+def clean_text(v) -> str:
+    """Free text from a model, without tag-like junk and with its spaces collapsed."""
+    return " ".join(TAG_RE.sub(" ", str(v or "")).split())
+
+
 def _check_str(v, name: str) -> str:
     if not isinstance(v, str):
         raise InvalidProposal(f"{name} must be a string")
-    return v[:MAX_REASON]
+    return clean_text(v)[:MAX_REASON]
 
 
 def validate(obj) -> Proposal:

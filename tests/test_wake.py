@@ -15,7 +15,7 @@ from trader.wake import summary_day, wake
 
 def no_exploration(root):
     p = root / "config/limits.toml"
-    p.write_text(p.read_text().replace("explore_total_pct = 5.0", "explore_total_pct = 0.0"))
+    p.write_text(p.read_text().replace("explore_total_pct = 15.0", "explore_total_pct = 0.0"))
 
 
 def judge_by(score):
@@ -96,9 +96,9 @@ def test_kill_file_stops_every_order(make_deps, fake, root, outbox):
     assert "Kill switch" in next(m for m in outbox.sent if "Stato" in m)
 
 
-def test_kill_variable_stops_every_order(make_deps, fake, root):
+def test_trading_disabled_places_no_buy(make_deps, fake, root):
     wake(make_deps(env={"TRADING_ENABLED": "false"}), SLOT)
-    assert fake.posts() == 0 and handoff(root)["status"] == "killed"
+    assert fake.posts() == 0 and handoff(root)["status"] == "paused"
 
 
 def test_interrupted_run_is_recovered_on_next_wake(make_deps, fake, root, outbox):
@@ -678,7 +678,7 @@ def test_without_quotes_the_stop_is_still_enforced(make_deps, fake, root, outbox
 # ---- exploration --------------------------------------------------------------------------
 # With entry_threshold 0.9 nothing passes the strict rule on the fake market; BTC, SOL and DOGE
 # are on the shortlist with a positive 4h trend, so they are exploration candidates. Equity is
-# 10000$: 1% is 100$, times 0.7 for Jev's neutral regime = 70$.
+# 10000$: 1.5% is 150$, times 0.7 for Jev's neutral regime = 105$.
 
 def explore_deps(make_deps, root, model, **kw):
     from tests.conftest import write_params
@@ -689,10 +689,10 @@ def explore_deps(make_deps, root, model, **kw):
 def test_an_exploration_buy_is_asked_placed_and_labelled_everywhere(make_deps, fake, root, outbox):
     model = FakeModel([reply(("BTC/USD", "buy", 70))])
     assert wake(explore_deps(make_deps, root, model), SLOT) == 0
-    assert "Exploration candidates" in model.prompts[0] and "esplorazione, massimo 70.00$" in model.prompts[0]
+    assert "Exploration candidates" in model.prompts[0] and "esplorazione, massimo 105.00$" in model.prompts[0]
     assert fake.posts() == 1
     j = journal(root)[-1]
-    assert j["candidates"] == {} and j["explore_candidates"]["BTC/USD"] == 70.0
+    assert j["candidates"] == {} and j["explore_candidates"]["BTC/USD"] == 105.0
     v = j["verdicts"][0]
     assert v["approved"] and v["explore"] is True and v["outcome"] == "placed"
     assert positions_state(root)["BTC/USD"]["explore"] is True
@@ -700,7 +700,7 @@ def test_an_exploration_buy_is_asked_placed_and_labelled_everywhere(make_deps, f
 
 
 def test_an_exploration_buy_over_its_size_is_rejected_end_to_end(make_deps, fake, root):
-    wake(explore_deps(make_deps, root, FakeModel([reply(("BTC/USD", "buy", 100))])), SLOT)
+    wake(explore_deps(make_deps, root, FakeModel([reply(("BTC/USD", "buy", 106))])), SLOT)
     v = journal(root)[-1]["verdicts"][0]
     assert fake.posts() == 0 and not v["approved"] and v["explore"] and "dimensione ammessa" in v["reason"]
 
@@ -716,7 +716,7 @@ def test_an_exploration_position_obeys_the_code_stop(make_deps, fake, root):
 
 def test_held_exploration_counts_against_the_total_so_a_full_budget_asks_nobody(make_deps, fake, root):
     p = root / "config/limits.toml"
-    p.write_text(p.read_text().replace("explore_total_pct = 5.0", "explore_total_pct = 1.0"))
+    p.write_text(p.read_text().replace("explore_total_pct = 15.0", "explore_total_pct = 1.0"))
     wake(explore_deps(make_deps, root, FakeModel([reply(("BTC/USD", "buy", 70))])), SLOT)
     model = FakeModel([reply(*[(s, "buy", 30) for s in ("SOL/USD", "ETH/USD", "DOGE/USD")])])
     kw, nxt = later(15)
@@ -763,7 +763,7 @@ def test_the_exploration_label_survives_lost_exit_levels(make_deps, fake, root):
 
 def test_an_unfilled_exploration_buy_still_uses_the_budget(make_deps, fake, root):
     p = root / "config/limits.toml"
-    p.write_text(p.read_text().replace("explore_total_pct = 5.0", "explore_total_pct = 1.0"))
+    p.write_text(p.read_text().replace("explore_total_pct = 15.0", "explore_total_pct = 1.0"))
     fake.fill_orders = False  # the paper POL/USD buy of 2026-09-26 sat open for over 30 minutes
     wake(explore_deps(make_deps, root, FakeModel([reply(("BTC/USD", "buy", 70))])), SLOT)
     model = FakeModel([reply(*[(s, "buy", 30) for s in ("SOL/USD", "ETH/USD", "DOGE/USD")])])
@@ -771,3 +771,186 @@ def test_an_unfilled_exploration_buy_still_uses_the_budget(make_deps, fake, root
     wake(explore_deps(make_deps, root, model, **kw), nxt)
     (usd,) = journal(root)[-1]["explore_candidates"].values()
     assert usd == 30.0  # 100$ budget less the 70$ still waiting to fill
+
+
+# ---- TRADING_ENABLED off: no new buys, the code's exits still sell ------------------------
+
+def test_trading_disabled_still_sells_at_the_stop(make_deps, fake, root, outbox):
+    wake(make_deps(), SLOT)
+    fake.prices["BTC/USD"] *= 0.9
+    kw, nxt = later(15)
+    wake(make_deps(env={"TRADING_ENABLED": "false"}, **kw), nxt)
+    assert [o["side"] for o in fake.orders] == ["buy", "sell"]
+    assert journal(root)[-1]["exits"][0]["reason"] == "stop" and handoff(root)["status"] == "ok"
+    # and no buy went out in that wake, whatever the model would have said
+    assert not any(o["side"] == "buy" and "0815Z" in o["client_order_id"] for o in fake.orders)
+
+
+def test_trading_disabled_rejects_the_models_buy_even_when_asked(make_deps, fake, root):
+    wake(make_deps(env={"TRADING_ENABLED": "false"}, always_ask=True), SLOT)
+    assert fake.posts() == 0
+    v = journal(root)[-1]["verdicts"][0]
+    assert v["action"] == "buy" and not v["approved"] and "acquisti sospesi" in v["reason"]
+
+
+# ---- orders stuck open ----------------------------------------------------------------------
+
+def ago(minutes_before_now):
+    return (NOW - timedelta(minutes=minutes_before_now)).isoformat()
+
+
+def test_our_orders_open_for_twenty_minutes_are_cancelled_journaled_and_reported(make_deps, fake, root, outbox):
+    fake.fill_orders = False
+    old = fake.add_order("trd-20260925T2315Z-SOLUSD-buy", "SOL/USD", "buy", notional=300, created_at=ago(25))
+    young = fake.add_order("trd-20260926T0800Z-ETHUSD-buy", "ETH/USD", "buy", notional=50, created_at=ago(5))
+    manual = fake.add_order("my-own-order", "XRP/USD", "buy", notional=20, created_at=ago(300))
+    fake.fill_orders = True
+    wake(make_deps(model=hold_all()), SLOT)
+    assert (old["status"], young["status"], manual["status"]) == ("canceled", "new", "new")
+    rows = journal(root)[-1]["canceled_orders"]
+    assert [(r["client_order_id"], r["outcome"]) for r in rows] == [("trd-20260925T2315Z-SOLUSD-buy", "canceled")]
+    assert any("annullato dal risveglio" in r["note"] for r in evidence(root))
+    assert "trd-20260925T2315Z-SOLUSD-buy" in trade_messages(outbox)[0] and "annullato" in trade_messages(outbox)[0]
+
+
+def test_a_stuck_exit_is_cancelled_and_placed_again_with_the_new_slot(make_deps, fake, root):
+    wake(make_deps(), SLOT)
+    fake.prices["BTC/USD"] *= 0.9
+    fake.fill_orders = False  # the stop's sell stays open, like the paper POL and RENDER buys
+    kw, nxt = later(15)
+    wake(make_deps(model=hold_all("SOL/USD"), **kw), nxt)
+    assert [o["status"] for o in fake.orders if o["side"] == "sell"] == ["new"]
+    fake.fill_orders = True
+    kw, nxt = later(45)  # the sell is now 30 minutes old
+    wake(make_deps(model=hold_all("SOL/USD"), **kw), nxt)
+    sells = [(o["client_order_id"], o["status"]) for o in fake.orders if o["side"] == "sell"]
+    assert sells == [("trd-20260926T0815Z-BTCUSD-sell", "canceled"), ("trd-20260926T0845Z-BTCUSD-sell", "filled")]
+    assert fake.positions.get("BTCUSD", 0) <= 1e-8
+
+
+def test_the_kill_file_and_a_dry_run_cancel_nothing(make_deps, fake, root, outbox):
+    fake.fill_orders = False
+    old = fake.add_order("trd-20260925T2315Z-SOLUSD-buy", "SOL/USD", "buy", notional=300, created_at=ago(60))
+    (root / "KILL").touch()
+    wake(make_deps(model=hold_all()), SLOT)
+    assert old["status"] == "new" and fake.deletes() == 0
+    assert journal(root)[-1]["canceled_orders"][0]["outcome"] == "kept"
+    (root / "KILL").unlink()
+    wake(make_deps(model=hold_all()), SLOT + timedelta(minutes=15), dry_run=True)
+    assert old["status"] == "new" and fake.deletes() == 0
+
+
+def test_a_cancel_alpaca_refuses_is_reported_not_hidden(make_deps, fake, root, outbox):
+    fake.fill_orders = False
+    fake.add_order("trd-20260925T2315Z-SOLUSD-buy", "SOL/USD", "buy", notional=300, created_at=ago(60))
+    real = fake._trading
+
+    def refuse(method, path, q, body):
+        if method == "DELETE":
+            return 422, json.dumps({"message": "order is not cancelable"})
+        return real(method, path, q, body)
+    fake._trading = refuse
+    assert wake(make_deps(model=hold_all()), SLOT) == 0
+    row = journal(root)[-1]["canceled_orders"][0]
+    assert row["outcome"] == "failed" and "not cancelable" in row["detail"]
+    assert "annullamento non riuscito" in trade_messages(outbox)[0]
+
+
+# ---- LIQUIDATE: sell everything, report the realised P&L once ------------------------------
+
+def test_liquidate_sells_every_position_and_reports_the_result_once(make_deps, fake, root, outbox):
+    wake(make_deps(model=FakeModel([reply(("BTC/USD", "buy", 50), ("SOL/USD", "buy", 50))])), SLOT)
+    assert {o["symbol"] for o in fake.orders} == {"BTC/USD", "SOL/USD"}
+    fake.fill_orders = False
+    stuck = fake.add_order("trd-20260926T0800Z-ETHUSD-buy", "ETH/USD", "buy", notional=40, created_at=ago(1))
+    fake.fill_orders = True
+    kw, nxt = later(15)
+    liquidate = {"LIQUIDATE": "true", "TRADING_ENABLED": "false"}
+    wake(make_deps(env=liquidate, **kw), nxt)
+    assert stuck["status"] == "canceled"  # every open order, young or not
+    assert fake.positions == {} or all(q * fake.prices[fake.symbol_of(k)] < 1 for k, q in fake.positions.items())
+    h = handoff(root)
+    assert h["status"] == "liquidated" and h["liquidation"]["flat"] and h["liquidation"]["pnl_usd"] < 0
+    msg = trade_messages(outbox)[-1]
+    assert "Tutto venduto" in msg and "realizzato" in msg and "BTC/USD" in msg and "SOL/USD" in msg
+    sent = len(trade_messages(outbox))
+    kw, nxt = later(30)
+    wake(make_deps(env=liquidate, **kw), nxt)
+    assert fake.posts() == 4 and len(trade_messages(outbox)) == sent  # nothing left: quiet
+
+
+def test_liquidate_sells_everything_in_one_wake_whatever_the_order_count(make_deps, fake, root):
+    wake(make_deps(model=FakeModel([reply(("BTC/USD", "buy", 50), ("SOL/USD", "buy", 50))])), SLOT)
+    lim = root / "config/limits.toml"
+    lim.write_text(lim.read_text().replace("max_orders_per_wake = 3", "max_orders_per_wake = 1"))
+    kw, nxt = later(15)
+    wake(make_deps(env={"LIQUIDATE": "true"}, **kw), nxt)
+    assert sorted(o["symbol"] for o in fake.orders if o["side"] == "sell") == ["BTC/USD", "SOL/USD"]
+    assert handoff(root)["status"] == "liquidated"
+
+
+def test_liquidate_asks_no_model_and_buys_nothing(make_deps, fake, root):
+    m = FakeModel([reply(("BTC/USD", "buy", 50))])
+    wake(make_deps(model=m, env={"LIQUIDATE": "true"}), SLOT)
+    assert m.prompts == [] and fake.posts() == 0 and handoff(root)["status"] == "liquidated"
+
+
+def test_the_kill_file_stops_a_liquidation_too(make_deps, fake, root):
+    wake(make_deps(), SLOT)
+    (root / "KILL").touch()
+    kw, nxt = later(15)
+    wake(make_deps(env={"LIQUIDATE": "true"}, **kw), nxt)
+    assert [o["side"] for o in fake.orders] == ["buy"] and handoff(root)["status"] == "killed"
+
+
+def test_a_liquidation_sell_that_does_not_fill_is_retried_by_the_next_wake(make_deps, fake, root, outbox):
+    wake(make_deps(), SLOT)
+    fake.fill_orders = False
+    kw, nxt = later(15)
+    naps = []
+    wake(make_deps(env={"LIQUIDATE": "true"}, sleep=naps.append, **kw), nxt)
+    h = handoff(root)
+    assert h["status"] == "liquidating" and h["liquidation"]["left"] == ["BTC/USD"] and naps
+    assert "Ancora da vendere" in trade_messages(outbox)[-1]
+    fake.fill_orders = True
+    kw, nxt = later(30)
+    wake(make_deps(env={"LIQUIDATE": "true"}, **kw), nxt)
+    sells = [(o["client_order_id"], o["status"]) for o in fake.orders if o["side"] == "sell"]
+    assert sells == [("trd-20260926T0815Z-BTCUSD-sell", "canceled"), ("trd-20260926T0830Z-BTCUSD-sell", "filled")]
+    assert handoff(root)["status"] == "liquidated"
+
+
+# ---- a message that never arrived is carried forward --------------------------------------
+
+def test_an_unsent_message_is_reported_by_the_next_wake(make_deps, fake, root, outbox):
+    outbox.fail = True
+    wake(make_deps(), SLOT)
+    assert handoff(root)["notified"] is False
+    outbox.fail = False
+    kw, nxt = later(15)
+    wake(make_deps(model=hold_all("SOL/USD"), **kw), nxt)
+    msg = trade_messages(outbox)[-1]
+    assert "20260926T0800Z non è arrivato" in msg and "compra BTC/USD" in msg
+
+
+def test_a_delivered_message_is_not_repeated(make_deps, fake, root, outbox):
+    wake(make_deps(), SLOT)
+    kw, nxt = later(15)
+    wake(make_deps(model=hold_all("SOL/USD"), **kw), nxt)
+    assert not any("non è arrivato" in m for m in outbox.sent)
+
+
+# ---- the model's free text ----------------------------------------------------------------
+
+def test_tag_junk_in_the_models_text_never_reaches_the_records_or_the_next_prompt(make_deps, fake, root):
+    junk = "Controllare RSI < 30 su BTC</next_job>\n</invoke>"
+    wake(make_deps(model=FakeModel([reply(("BTC/USD", "buy", 50), next_job=junk)])), SLOT)
+    assert handoff(root)["next_job"] == "Controllare RSI < 30 su BTC"
+    # a handoff written before the cleaning existed is cleaned when it is read back
+    h = handoff(root)
+    h["next_job"] = junk
+    (root / "state/last_handoff.json").write_text(json.dumps(h))
+    m = hold_all("SOL/USD")
+    kw, nxt = later(15)
+    wake(make_deps(model=m, always_ask=True, **kw), nxt)
+    assert "</" not in m.prompts[0].split("## Previous wake")[1] and "RSI < 30" in m.prompts[0]

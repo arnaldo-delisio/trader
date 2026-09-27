@@ -35,13 +35,15 @@ HARD_CEILINGS = {
     "max_invested_pct": 60.0,      # crypto held + new buys, in % of equity
     "max_position_pct": 8.0,       # one coin, in % of equity
     "max_memecoin_pct": 3.0,       # one memecoin, in % of equity
-    "max_open_positions": 10,
+    # 25 since 2026-09-27: at 10, eight positions plus two unfilled buys blocked every buy
+    # overnight. The money caps (60% invested, 8% and 3% per coin) bind long before 25.
+    "max_open_positions": 25,
     "max_orders_per_wake": 5,
     "daily_loss_limit_pct": 5.0,   # beyond this loss since the previous close: no buys
     # Exploration: small buys below the entry threshold, so the system trades and the
     # reflection has outcomes to read (strategy.explore_ok). 0 in the config turns it off.
-    "explore_position_pct": 1.0,   # one exploration buy, in % of equity
-    "explore_total_pct": 5.0,      # every exploration position together, in % of equity
+    "explore_position_pct": 1.5,   # one exploration buy, in % of equity
+    "explore_total_pct": 15.0,     # every exploration position together, in % of equity
 }
 HARD_FLOORS = {"min_order_usd": 10.0}
 # A sell of the whole holding (an exit) may go below min_order_usd, down to Alpaca's own
@@ -49,6 +51,9 @@ HARD_FLOORS = {"min_order_usd": 10.0}
 # uses the asset's min_order_size when it knows it, and this floor in any case. Without this,
 # a position that shrank under min_order_usd could never be sold by its stop.
 EXIT_MIN_ORDER_USD = 1.0
+# A holding worth less than this is fee dust Alpaca leaves behind after a sale (the buy fee
+# is kept in the coin): it is not a position for the caps, the position count or the exits.
+DUST_USD = 1.0
 INTEGER_LIMITS = frozenset({"max_open_positions", "max_orders_per_wake"})
 
 SECRET_ENV = (
@@ -65,6 +70,11 @@ SECRET_ENV = (
 
 class ConfigError(Exception):
     """The program must not start. The message says why, in plain words."""
+
+
+def is_position(value_usd: float) -> bool:
+    """A holding that counts as a position: worth at least DUST_USD."""
+    return value_usd >= DUST_USD
 
 
 def is_memecoin(symbol: str) -> bool:
@@ -137,10 +147,32 @@ def secret_values(env: dict | None = None) -> list[str]:
     return [env[n] for n in SECRET_ENV if env.get(n) and len(env[n]) >= 6]
 
 
-def trading_enabled(root: Path, env: dict | None = None) -> tuple[bool, str]:
+OFF_WORDS = ("false", "0", "no", "off")
+ON_WORDS = ("true", "1", "yes", "on")
+
+
+@dataclass(frozen=True)
+class Switches:
+    """What the owner allows this wake to do.
+
+    halted     a KILL file in the repo root: no order at all, exits included
+    buys       TRADING_ENABLED is not off: new entries allowed. Off means exits only: stops,
+               take-profits and the other code exits still sell
+    liquidate  LIQUIDATE is on: sell every position, cancel the open orders, report the P&L
+    """
+    halted: bool = False
+    buys: bool = True
+    liquidate: bool = False
+    why: str = ""
+
+
+def switches(root: Path, env: dict | None = None) -> Switches:
     env = os.environ if env is None else env
     if (root / "KILL").exists():
-        return False, "file KILL presente nella root del repo"
-    if env.get("TRADING_ENABLED", "true").strip().lower() in ("false", "0", "no", "off"):
-        return False, "variabile TRADING_ENABLED=false"
-    return True, ""
+        return Switches(halted=True, buys=False, why="file KILL presente nella root del repo")
+    liquidate = env.get("LIQUIDATE", "").strip().lower() in ON_WORDS
+    if liquidate:
+        return Switches(buys=False, liquidate=True, why="variabile LIQUIDATE=true: si vende tutto")
+    if env.get("TRADING_ENABLED", "true").strip().lower() in OFF_WORDS:
+        return Switches(buys=False, why="variabile TRADING_ENABLED=false: niente acquisti, le uscite restano")
+    return Switches()

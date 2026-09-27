@@ -17,8 +17,8 @@ Rules in force: {{PARAMS}}
 
 ## Exploration candidates (below the entry rule, small size)
 These did not pass the strict entry rule (see why on each line) but are on the shortlist
-with a positive 4h trend. Code allows a small **exploration** buy on them: at most 1% of
-equity each and 5% for all exploration positions together, with the same stops and
+with a positive 4h trend. Code allows a small **exploration** buy on them: at most 1.5% of
+equity each and 15% for all exploration positions together, with the same stops and
 take-profits. Their purpose is to collect outcomes the reflection can learn from, so the
 system does not sit in cash for days. Buy one only if its bull case is concrete; skip it
 if the bear case is stronger. Exploration buys are reported separately.

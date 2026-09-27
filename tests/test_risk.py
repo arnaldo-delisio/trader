@@ -240,11 +240,12 @@ def test_hard_ceilings_are_the_approved_numbers():
     assert {k: HARD_CEILINGS[k] for k in ("max_invested_pct", "max_position_pct", "max_memecoin_pct",
                                           "max_open_positions", "daily_loss_limit_pct")} == {
         "max_invested_pct": 60.0, "max_position_pct": 8.0, "max_memecoin_pct": 3.0,
-        "max_open_positions": 10, "daily_loss_limit_pct": 5.0}
+        "max_open_positions": 25, "daily_loss_limit_pct": 5.0}
     assert HARD_CEILINGS["max_orders_per_wake"] <= 5 and HARD_FLOORS["min_order_usd"] >= 10.0
     huge = clamp_limits({**RAW, **{k: 10 ** 9 for k in HARD_CEILINGS}, "min_order_usd": 0})
     assert (huge.max_invested_pct, huge.max_position_pct, huge.max_memecoin_pct, huge.max_open_positions,
-            huge.daily_loss_limit_pct, huge.min_order_usd) == (60.0, 8.0, 3.0, 10, 5.0, 10.0)
+            huge.daily_loss_limit_pct, huge.min_order_usd) == (60.0, 8.0, 3.0, 25, 5.0, 10.0)
+    assert clamp_limits({**RAW, "max_open_positions": 26}).max_open_positions == 25
 
 
 # ---- exploration: small buys below the entry threshold, under their own caps -----------
@@ -298,8 +299,44 @@ def test_exploration_turned_off_in_the_config_rejects_every_exploration_buy():
 
 def test_config_cannot_raise_the_exploration_caps():
     lim = clamp_limits({**RAW, "explore_position_pct": 8, "explore_total_pct": 60})
-    assert (lim.explore_position_pct, lim.explore_total_pct) == (1.0, 5.0)
-    assert (HARD_CEILINGS["explore_position_pct"], HARD_CEILINGS["explore_total_pct"]) == (1.0, 5.0)
+    assert (lim.explore_position_pct, lim.explore_total_pct) == (1.5, 15.0)
+    assert (HARD_CEILINGS["explore_position_pct"], HARD_CEILINGS["explore_total_pct"]) == (1.5, 15.0)
+
+
+def test_the_hard_exploration_caps_reject_a_buy_over_them():
+    # The config at the ceilings: 1.5% of 10000$ per buy is 150$, 15% in total is 1500$.
+    top = clamp_limits({**RAW, "explore_position_pct": 1.5, "explore_total_pct": 15})
+    wide = {"SOL/USD": 1000.0, "LINK/USD": 1000.0}
+    assert explore_one(buy("SOL/USD", 150), limits=top, explore=wide).approved
+    v = explore_one(buy("SOL/USD", 151), limits=top, explore=wide)
+    assert not v.approved and "1.5% del patrimonio per posizione" in v.reason
+    held = {f"C{i}USD": Holding(1, 150.0) for i in range(9)}  # 1350$ of exploration already
+    v = explore_one(buy("SOL/USD", 151 - 1), replace(SNAP, holdings=held), limits=top, explore=wide,
+                    explore_held=frozenset(held))
+    assert v.approved
+    held["C9USD"] = Holding(1, 100.0)  # 1450$: 150$ more would make 1600$
+    v = explore_one(buy("SOL/USD", 150), replace(SNAP, holdings=held), limits=top, explore=wide,
+                    explore_held=frozenset(held))
+    assert not v.approved and "15% del patrimonio" in v.reason
+
+
+def test_explore_exposure_counts_held_and_pending_exploration_only():
+    from trader.risk import explore_exposure
+    snap = replace(SNAP, holdings={"SOLUSD": Holding(1, 120.0), "BTCUSD": Holding(1, 700.0)},
+                   pending_buys={"LINKUSD": 80.0, "ETHUSD": 300.0})
+    assert explore_exposure(snap, frozenset({"SOLUSD", "LINKUSD"})) == 200.0
+    assert explore_exposure(snap, frozenset()) == 0.0
+
+
+# ---- TRADING_ENABLED off: exits only -------------------------------------------------------
+
+def test_buys_switched_off_reject_every_buy_but_let_sells_through():
+    snap = replace(SNAP, holdings={"BTCUSD": Holding(0.01, 600.0)})
+    vs = many([buy("ETH/USD", 50), sell("BTC/USD", 600)], snap, buys_enabled=False,
+              disabled_reason="TRADING_ENABLED=false")
+    assert not vs[0].approved and "acquisti sospesi" in vs[0].reason
+    assert vs[1].approved and vs[1].order == {"symbol": "BTC/USD", "side": "sell", "qty": 0.01}
+    assert "acquisti sospesi" in explore_one(buy("SOL/USD", 100), buys_enabled=False).reason
 
 
 def test_exploration_buys_obey_every_other_limit_too():

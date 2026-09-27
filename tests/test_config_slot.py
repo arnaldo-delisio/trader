@@ -4,7 +4,7 @@ import pytest
 
 from trader.__main__ import main
 from trader.broker import Alpaca
-from trader.config import ConfigError, assert_paper, require_env, trading_enabled
+from trader.config import ConfigError, Switches, assert_paper, require_env, switches
 from trader.slot import (
     cadence_bucket,
     is_last_slot_of_day,
@@ -59,11 +59,21 @@ def test_require_env_names_every_missing_variable():
     assert "B" in str(e.value) and "A," not in str(e.value)
 
 
-def test_kill_file_and_variable(tmp_path):
-    assert trading_enabled(tmp_path, {}) == (True, "")
-    assert not trading_enabled(tmp_path, {"TRADING_ENABLED": "false"})[0]
+def test_kill_file_halts_everything_and_the_variable_only_stops_buys(tmp_path):
+    assert switches(tmp_path, {}) == Switches()
+    off = switches(tmp_path, {"TRADING_ENABLED": "false"})
+    assert (off.halted, off.buys, off.liquidate) == (False, False, False)
+    liq = switches(tmp_path, {"TRADING_ENABLED": "false", "LIQUIDATE": "true"})
+    assert (liq.halted, liq.buys, liq.liquidate) == (False, False, True)
     (tmp_path / "KILL").touch()
-    assert not trading_enabled(tmp_path, {"TRADING_ENABLED": "true"})[0]
+    for env in ({"TRADING_ENABLED": "true"}, {"LIQUIDATE": "true"}):
+        k = switches(tmp_path, env)
+        assert (k.halted, k.buys, k.liquidate) == (True, False, False) and "KILL" in k.why
+
+
+@pytest.mark.parametrize("value", ["", "false", "0", "maybe", "tru"])
+def test_liquidate_needs_an_explicit_true(tmp_path, value):
+    assert not switches(tmp_path, {"LIQUIDATE": value}).liquidate
 
 
 def test_slot_is_the_15_minute_bucket():
@@ -95,7 +105,7 @@ def test_cadence_bucket_is_six_hours_and_the_day_ends_at_23_45():
 
 @pytest.mark.parametrize("value", ["false", "FALSE", " False ", "0", "no", "off"])
 def test_kill_variable_accepts_every_off_spelling(tmp_path, value):
-    assert not trading_enabled(tmp_path, {"TRADING_ENABLED": value})[0]
+    assert not switches(tmp_path, {"TRADING_ENABLED": value}).buys
 
 
 def test_account_with_crypto_disabled_counts_as_blocked():
@@ -155,4 +165,12 @@ def test_the_workflow_does_not_trade_unless_the_variable_says_true():
     wf = (Path(__file__).resolve().parent.parent / ".github/workflows/wake.yml").read_text()
     line = re.search(r"^\s+TRADING_ENABLED:(.*)$", wf, re.MULTILINE).group(1)
     assert "vars.TRADING_ENABLED" in line and "'false'" in line
-    assert trading_enabled(Path("/nonexistent"), {"TRADING_ENABLED": "false"})[0] is False
+    assert switches(Path("/nonexistent"), {"TRADING_ENABLED": "false"}).buys is False
+
+
+def test_the_workflow_passes_liquidate_defaulting_to_false():
+    import re
+    from pathlib import Path
+    wf = (Path(__file__).resolve().parent.parent / ".github/workflows/wake.yml").read_text()
+    line = re.search(r"^\s+LIQUIDATE:(.*)$", wf, re.MULTILINE).group(1)
+    assert "vars.LIQUIDATE" in line and "'false'" in line

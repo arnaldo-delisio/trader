@@ -1,11 +1,15 @@
 """python -m trader wake [--slot ISO] [--dry-run] [--records DIR] [--reflect] [--always-ask]
+python -m trader save-records [--branch work]     commit and push the records (trader/publish.py)
+python -m trader alert MESSAGE                    a failure notice on Telegram
 
 Environment:
   ALPACA_API_KEY, ALPACA_SECRET_KEY          paper keys (not needed with BROKER=fake)
   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID       required unless --dry-run (then messages are printed)
   MODEL=claude-cli|anthropic-api|fake        default claude-cli (needs CLAUDE_CODE_OAUTH_TOKEN)
   BROKER=alpaca|fake                         default alpaca; fake is an in-memory paper account
-  TRADING_ENABLED=false                      kill switch (also: a KILL file in the repo root)
+  TRADING_ENABLED=false                      no new buys; stops and take-profits still sell
+  LIQUIDATE=true                             sell every position, cancel open orders, report the P&L
+  (a KILL file in the repo root stops every order, exits included)
   JEV_API_KEY, GROQ_API_KEY                  market regime (Jev, Groq fallback); without them: neutral
   RUN_URL                                    link to the Actions run, shown in messages
 """
@@ -21,7 +25,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from . import model as models
-from . import notify
+from . import notify, publish
 from .broker import Alpaca
 from .config import ConfigError, assert_paper, load_limits, require_env, secret_values
 from .fake_alpaca import FakeAlpaca
@@ -95,6 +99,14 @@ def cmd_alert(args, env: dict) -> int:
     return 0 if ok else 1
 
 
+def cmd_save_records(args, env: dict) -> int:
+    try:
+        return 0 if publish.save(ROOT, remote=args.remote, branch=args.branch) else 1
+    except publish.PublishError as e:
+        print(f"ERRORE: {e}", file=sys.stderr)
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="trader", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -107,10 +119,13 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("alert", help="send a failure notice")
     a.add_argument("message")
     a.add_argument("--slot")
+    s = sub.add_parser("save-records", help="commit the records and push them, rewriting them on top if needed")
+    s.add_argument("--remote", default="origin")
+    s.add_argument("--branch", default="work")
     args = p.parse_args(argv)
     env = dict(os.environ)
     try:
-        return {"wake": cmd_wake, "alert": cmd_alert}[args.cmd](args, env)
+        return {"wake": cmd_wake, "alert": cmd_alert, "save-records": cmd_save_records}[args.cmd](args, env)
     except (ConfigError, ValueError) as e:
         print(f"ERRORE: {e}", file=sys.stderr)
         return 2
