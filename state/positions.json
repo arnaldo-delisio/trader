@@ -1,0 +1,115 @@
+{
+  "positions": {
+    "AAVE/USD": {
+      "atr_at_entry": 1.7419717287985048,
+      "client_order_id": "trd-20260927T0530Z-AAVEUSD-buy",
+      "entry_at": "2026-09-27 05:32 UTC",
+      "entry_price": 155.3,
+      "entry_t": 1790487165,
+      "explore": true,
+      "highest": 156.912,
+      "stop": 149.83167642522983,
+      "take_profit": 165.75183037279103
+    },
+    "BAT/USD": {
+      "atr_at_entry": 0.0017701442778930616,
+      "client_order_id": "trd-20260926T2315Z-BATUSD-buy",
+      "entry_at": "2026-09-26 23:16 UTC",
+      "entry_price": 0.0958502,
+      "entry_t": 1790464582,
+      "explore": true,
+      "highest": 0.0971586,
+      "stop": 0.09051091139513072,
+      "take_profit": 0.10647106566735837
+    },
+    "DOT/USD": {
+      "atr_at_entry": 0.022506799666063615,
+      "client_order_id": "trd-20260926T2345Z-DOTUSD-buy",
+      "entry_at": "2026-09-26 23:48 UTC",
+      "entry_price": 1.24308,
+      "entry_t": 1790466519,
+      "explore": true,
+      "highest": 1.26695,
+      "stop": 1.1933480915451513,
+      "take_profit": 1.3781207979963817
+    },
+    "FIL/USD": {
+      "atr_at_entry": 0.02683364431814692,
+      "client_order_id": "trd-20260926T2345Z-FILUSD-buy",
+      "entry_at": "2026-09-26 23:48 UTC",
+      "entry_price": 1.138,
+      "entry_t": 1790466519,
+      "explore": true,
+      "highest": 1.14576,
+      "stop": 1.053410505876643,
+      "take_profit": 1.2990018659088813
+    },
+    "LINK/USD": {
+      "atr_at_entry": 0.17015738096383587,
+      "client_order_id": "trd-20260927T0000Z-LINKUSD-buy",
+      "entry_at": "2026-09-27 00:00 UTC",
+      "entry_price": 14.1548,
+      "entry_t": 1790467225,
+      "explore": true,
+      "highest": 14.265,
+      "stop": 13.616931525858195,
+      "take_profit": 15.175744285783015
+    },
+    "POL/USD": {
+      "atr_at_entry": 0.0017868183941387227,
+      "client_order_id": "trd-20260926T2315Z-POLUSD-buy",
+      "entry_at": "2026-09-26 23:16 UTC",
+      "entry_price": 0.1206,
+      "entry_t": 1790464582,
+      "explore": true,
+      "highest": 0.1206,
+      "stop": 0.1134527264234451,
+      "take_profit": 0.13132091036483234
+    },
+    "RENDER/USD": {
+      "atr_at_entry": 0.0330774288662313,
+      "client_order_id": "trd-20260927T0015Z-RENDERUSD-buy",
+      "entry_at": "2026-09-27 00:15 UTC",
+      "entry_price": 2.00267,
+      "entry_t": 1790468124,
+      "explore": true,
+      "highest": 2.00267,
+      "stop": 1.8703602845350749,
+      "take_profit": 2.201134573197388
+    },
+    "SUSHI/USD": {
+      "atr_at_entry": 0.0038901883122442514,
+      "client_order_id": "trd-20260927T0030Z-SUSHIUSD-buy",
+      "entry_at": "2026-09-27 00:31 UTC",
+      "entry_price": 0.2672,
+      "entry_t": 1790469112,
+      "explore": true,
+      "highest": 0.2706885,
+      "stop": 0.25621088055763147,
+      "take_profit": 0.2905411298734655
+    },
+    "UNI/USD": {
+      "atr_at_entry": 0.14296975115112534,
+      "client_order_id": "trd-20260927T0145Z-UNIUSD-buy",
+      "entry_at": "2026-09-27 01:46 UTC",
+      "entry_price": 9.846,
+      "entry_t": 1790473584,
+      "explore": true,
+      "highest": 10.13055,
+      "stop": 9.570583171458745,
+      "take_profit": 10.703818506906753
+    },
+    "YFI/USD": {
+      "atr_at_entry": 23.301892992260072,
+      "client_order_id": "trd-20260927T0500Z-YFIUSD-buy",
+      "entry_at": "2026-09-27 05:02 UTC",
+      "entry_price": 2482.45,
+      "entry_t": 1790485365,
+      "explore": true,
+      "highest": 2494.47,
+      "stop": 2402.100397287423,
+      "take_profit": 2622.26135795356
+    }
+  },
+  "updated_at": "2026-09-27T06:47:43.783548+00:00"
+}

@@ -1,0 +1,3 @@
+{
+  "market_regime": {"type": "choice", "confidence_floor": 0.6, "trust_fallback": true}
+}

@@ -1,0 +1,24 @@
+{
+  "note": "Parametri della strategia. Limiti e passo massimo in trader/strategy.py (PARAM_BOUNDS). Scelti con scripts/backtest.py: vedi STRATEGY.md.",
+  "weights": {
+    "trend_4h": 1.0,
+    "trend_1h": 1.0,
+    "momentum": 1.0,
+    "macd": 0.5,
+    "rsi": 0.5,
+    "adx": 0.5,
+    "volume": 0.25,
+    "bollinger": 0.0
+  },
+  "entry_threshold": 0.8,
+  "exit_threshold": -0.3,
+  "stop_atr_mult": 4.0,
+  "tp_atr_mult": 6.0,
+  "min_edge_mult": 12.0,
+  "shortlist_size": 8,
+  "risk_per_trade_pct": 0.5,
+  "position_pct": 8.0,
+  "cooldown_hours": 24.0,
+  "max_hold_hours": 168.0,
+  "regime_filter": 1
+}

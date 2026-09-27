@@ -1,0 +1,21 @@
+[project]
+name = "trader"
+version = "0.1.0"
+description = "Agente autonomo di trading crypto su Alpaca paper, svegliato da GitHub Actions."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff==0.16.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+# The whole repo, ui/ and scripts/ included; CI runs the same pinned version (uv.lock).
+line-length = 120
+target-version = "py312"

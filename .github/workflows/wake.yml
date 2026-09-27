@@ -1,0 +1,105 @@
+name: wake
+
+# A wake-up every 15 minutes. GitHub starts scheduled runs 5 to 15 minutes late and
+# sometimes skips them: the slot is the 15-minute bucket the run starts in
+# (trader/slot.py), a skipped slot is recorded and never caught up.
+# Check that the schedule fires: gh run list --workflow wake.yml --event schedule
+# (none had fired by 2026-09-26 23:15 UTC, 70 minutes after this cron was pushed and over
+# four hours after the first schedule was added; this edit re-registers it).
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Slot da eseguire, es. 2026-09-26T08:15Z (vuoto = slot corrente)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Prova: nessun ordine, nessun commit dei record"
+        type: boolean
+        default: false
+      reflect:
+        description: "Fai subito la riflessione, senza aspettare il blocco di 6 ore"
+        type: boolean
+        default: false
+
+# One wake-up at a time; a queued run waits instead of cancelling a running one.
+concurrency:
+  group: trader-wake
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      JEV_API_KEY: ${{ secrets.JEV_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      MODEL: ${{ vars.MODEL || 'claude-cli' }}
+      # The kill switch as a repository variable: without it set to true, nothing trades.
+      TRADING_ENABLED: ${{ vars.TRADING_ENABLED || 'false' }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      INPUT_SLOT: ${{ inputs.slot }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
+      INPUT_REFLECT: ${{ inputs.reflect }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code && claude --version
+
+      # The tests run in ci.yml on every code push; the wake runs code that passed them.
+      - name: Wake
+        id: wake
+        run: |
+          args=(wake)
+          if [ -n "$INPUT_SLOT" ]; then args+=(--slot "$INPUT_SLOT"); fi
+          if [ "$INPUT_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          if [ "$INPUT_REFLECT" = "true" ]; then args+=(--reflect); fi
+          uv run --frozen python -m trader "${args[@]}"
+
+      # Records are committed whenever the wake ran, including when it failed:
+      # a failed wake-up's handoff is exactly what the next one needs to read.
+      - name: Commit records
+        if: always() && steps.wake.outcome != 'skipped' && env.INPUT_DRY_RUN != 'true'
+        run: |
+          git config user.name "trader-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state journal evidence lessons config/params.json
+          if git diff --cached --quiet; then echo "nessun record da salvare"; exit 0; fi
+          msg=$(python3 -c "import json;h=json.load(open('state/last_handoff.json'));print(h.get('commit_message') or 'Record wake ' + h['slot_id'] + ' ' + h['status'])")
+          git commit -q -m "$msg"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase -q origin work && git push -q origin HEAD:work; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          echo "push dei record fallito dopo 5 tentativi" >&2
+          exit 1
+
+      # The wake notifies on its own failures. This covers the case where it never ran.
+      - name: Alert if the wake did not run
+        if: failure() && steps.wake.outcome == 'skipped'
+        run: |
+          python3 -m trader alert "il risveglio non è partito: installazione fallita" || true

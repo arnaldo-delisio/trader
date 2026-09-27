@@ -1,0 +1,25 @@
+# Limiti del risk gate. Il codice ha dei tetti (trader/config.py, HARD_CEILINGS e
+# HARD_FLOORS) che questo file non può superare: un valore più alto viene ridotto al
+# tetto, un minimo più basso viene alzato. Questo file può solo stringere.
+
+# Le crypto ammesse. Solo quelle anche in trader/config.py (HARD_SYMBOLS) contano.
+symbols = [
+  "AAVE/USD", "ADA/USD", "ARB/USD", "AVAX/USD", "BAT/USD", "BCH/USD", "BONK/USD", "BTC/USD",
+  "CRV/USD", "DOGE/USD", "DOT/USD", "ETH/USD", "FIL/USD", "GRT/USD", "HYPE/USD", "LDO/USD",
+  "LINK/USD", "LTC/USD", "ONDO/USD", "POL/USD", "RENDER/USD", "SHIB/USD", "SKY/USD", "SOL/USD",
+  "SUSHI/USD", "TRUMP/USD", "UNI/USD", "WIF/USD", "XRP/USD", "XTZ/USD", "YFI/USD",
+]
+
+max_invested_pct = 60.0      # % del patrimonio investito in crypto, al massimo
+max_position_pct = 8.0       # % del patrimonio in una sola crypto
+max_memecoin_pct = 3.0       # % del patrimonio in una sola memecoin
+max_open_positions = 10      # posizioni aperte al massimo
+max_orders_per_wake = 3      # ordini al massimo per risveglio (uscite comprese)
+daily_loss_limit_pct = 5.0   # oltre questa perdita dalla chiusura precedente: niente acquisti, vendite ammesse
+min_order_usd = 10.0         # sotto questo importo l'ordine non parte
+
+# Esplorazione: piccoli acquisti sotto la soglia d'ingresso, su crypto della lista corta in
+# tendenza positiva sul 4h, per avere operazioni da cui la riflessione possa imparare.
+# Tetti nel codice: 1% per posizione, 5% in totale. 0 la spegne.
+explore_position_pct = 1.0   # % del patrimonio per un acquisto di esplorazione
+explore_total_pct = 5.0      # % del patrimonio in tutte le posizioni di esplorazione insieme

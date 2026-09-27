@@ -1,0 +1,27 @@
+name: ci
+
+# Record commits from the wake (every 15 minutes) change no code: they skip CI.
+on:
+  push:
+    paths-ignore: ["state/**", "journal/**", "evidence/**", "lessons/**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      # The whole repo, ui/ and scripts/ included, with the ruff pinned in uv.lock.
+      - name: Lint
+        run: uv run --frozen ruff check .
+      - name: Tests
+        run: uv run --frozen pytest
+      - name: Failure scenarios
+        run: uv run --frozen python scripts/simulate.py
+      # A broken workflow file fails silently at the next cron; catch it on push.
+      - name: Lint workflows
+        run: uvx --from actionlint-py actionlint .github/workflows/*.yml
