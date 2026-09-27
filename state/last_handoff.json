@@ -1,32 +1,58 @@
 {
-  "slot": "2026-09-27T07:45:00+00:00",
-  "slot_id": "20260927T0745Z",
-  "started_at": "2026-09-27T07:47:38.421898+00:00",
-  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36304185982",
+  "slot": "2026-09-27T08:00:00+00:00",
+  "slot_id": "20260927T0800Z",
+  "started_at": "2026-09-27T08:02:18.267229+00:00",
+  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36304929071",
   "dry_run": false,
   "status": "ok",
   "decisions": [
     {
-      "symbol": "AVAX/USD",
+      "symbol": "RENDER/USD",
       "action": "buy",
-      "requested_usd": 600.0,
+      "requested_usd": 500.0,
       "approved": true,
       "reason": "ammesso",
       "order": {
-        "symbol": "AVAX/USD",
+        "symbol": "RENDER/USD",
         "side": "buy",
-        "notional": 600.0
+        "notional": 500.0
       },
       "explore": true,
-      "reason_model": "Score 0.68 sotto soglia ma vicino, ADX 15 troppo basso per size piena: apro solo una frazione del massimo esplorativo (1500.22$) per contenere il rischio di un trend fragile.",
-      "bull_case": "Trend 4h e 1h entrambi a +1.00 con RSI 59 sano e costo giro 1.08% ampiamente coperto da un potenziale TP a +6 ATR (~13%).",
-      "bear_case": "ADX a soli 15 indica un trend debole/poco direzionale, rischio che il prezzo oscilli lateralmente e tocchi lo stop prima del TP.",
+      "reason_model": "Score 0.78 e ADX 27 sono i migliori tra le esplorazioni disponibili, costo giro 0.87% ampiamente coperto dal potenziale TP a +9.5% dal prezzo attuale.",
+      "bull_case": "Score 0.78 quasi alla soglia, trend 4h e 1h entrambi a +1.00, ADX 27 indica un trend con forza reale e non solo rumore.",
+      "bear_case": "RSI a 64 inizia ad avvicinarsi a zone di ipercomprato dopo un +35.4% settimanale, rischio di ritracciamento prima di nuova spinta.",
       "auto": false,
       "outcome": "placed",
-      "client_order_id": "trd-20260927T0745Z-AVAXUSD-buy",
+      "client_order_id": "trd-20260927T0800Z-RENDERUSD-buy",
       "detail": "inviato",
-      "stop": 10.539733262017153,
-      "take_profit": 12.152900106974274
+      "stop": 1.9431258493840298,
+      "take_profit": 2.270336225923955
+    },
+    {
+      "symbol": "ARB/USD",
+      "action": "hold",
+      "requested_usd": 0.0,
+      "approved": false,
+      "reason": "hold: nessun ordine",
+      "order": null,
+      "explore": false,
+      "reason_model": "ADX 14 troppo basso per fidarsi della persistenza del trend rispetto a RENDER che ha ADX 27 a parità di setup esplorativo.",
+      "bull_case": "Momentum positivo 7g +12.3% e trend 4h/1h pieno a +1.00 con RSI 64 non ancora estremo.",
+      "bear_case": "ADX solo 14 segnala un trend debole/poco direzionale, rischio elevato di falso segnale nonostante lo score 0.75.",
+      "auto": false
+    },
+    {
+      "symbol": "SOL/USD",
+      "action": "hold",
+      "requested_usd": 0.0,
+      "approved": false,
+      "reason": "hold: nessun ordine",
+      "order": null,
+      "explore": false,
+      "reason_model": "ADX 14 e RSI 68 insieme suggeriscono rischio di inversione a breve superiore al beneficio atteso, score 0.70 il più basso dei tre candidati esplorativi.",
+      "bull_case": "Score 0.70 con trend 4h/1h pieno e ATR contenuto allo 0.87%, costo giro basso allo 0.59%.",
+      "bear_case": "RSI 68 vicino a ipercomprato e ADX 14 indicano trend debole, ATR stretto rende lo stop vulnerabile a rumore normale.",
+      "auto": false
     },
     {
       "symbol": "AAVE/USD",
@@ -36,9 +62,22 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Nessun trigger di stop, take-profit o uscita per score: +0.9% da 2h, score +0.58 ben sopra -0.3.",
-      "bull_case": "Posizione in leggero utile (+0.9%) con score ancora positivo a +0.58, lontano da stop e uscita.",
-      "bear_case": "Score più basso del gruppo (+0.58), se scende sotto -0.3 andrà chiuso per debolezza.",
+      "reason_model": "Nessuna violazione di stop, TP o soglia di uscita: score +0.58 e prezzo sopra entrata, si mantiene la gestione automatica.",
+      "bull_case": "Posizione in utile +0.9%, score 0.58 ancora ben sopra la soglia di uscita -0.3.",
+      "bear_case": "Score 0.58 è il più basso tra le posizioni aperte, segnale in indebolimento rispetto all'ingresso.",
+      "auto": false
+    },
+    {
+      "symbol": "AVAX/USD",
+      "action": "hold",
+      "requested_usd": 0.0,
+      "approved": false,
+      "reason": "hold: nessun ordine",
+      "order": null,
+      "explore": false,
+      "reason_model": "Variazione -0.4% minima e score 0.72 ancora forte, nessun motivo per uscita anticipata.",
+      "bull_case": "Score 0.72 solido, aperta da poco (0h), trend ancora valido.",
+      "bear_case": "Prezzo -0.4% sotto entrata, prima flessione da monitorare.",
       "auto": false
     },
     {
@@ -49,9 +88,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Nessuna condizione di uscita soddisfatta: +0.3% da 9h, score +0.79 solido.",
-      "bull_case": "Score alto (+0.79) e trend confermato, posizione in utile +0.3%.",
-      "bear_case": "Guadagno ancora minimo dopo 9h, il tempo passa verso il limite di 168h senza forte accelerazione.",
+      "reason_model": "Score 0.75 e prezzo sopra entrata, nessun segnale di uscita richiesto dalle regole.",
+      "bull_case": "In utile +0.6%, score 0.75 alto, trend confermato da 9h.",
+      "bear_case": "Guadagno modesto dopo 9h, potrebbe stagnare.",
       "auto": false
     },
     {
@@ -62,9 +101,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Performance positiva e score forte, nessun motivo per chiudere anticipatamente: +2.5%, score +0.79.",
-      "bull_case": "Score +0.79 e +2.5% di guadagno mostrano momentum solido dopo 8h.",
-      "bear_case": "Vicinanza relativa al take-profit potrebbe invertire se il momentum rallenta.",
+      "reason_model": "Score 0.76 e +2.3% di performance confermano la tenuta della posizione senza necessità di intervento.",
+      "bull_case": "Miglior score tra le esplorazioni (0.76) con utile +2.3% dopo 8h.",
+      "bear_case": "Vicino a metà strada verso il take-profit, possibile consolidamento.",
       "auto": false
     },
     {
@@ -75,9 +114,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Nessun segnale di stop/TP/uscita: +1.0%, score +0.74, tenuta 8h su 168h massime.",
-      "bull_case": "Score +0.74 e +1.0% di progresso, trend ancora intatto.",
-      "bear_case": "Guadagno modesto dopo 8h, rischio di stagnazione prolungata.",
+      "reason_model": "Score 0.78 ben sopra soglia di uscita, performance positiva, si lascia lavorare la posizione.",
+      "bull_case": "Score 0.78, il più alto tra le posizioni aperte, in utile +1.3%.",
+      "bear_case": "ATR ampio implica volatilità che potrebbe generare oscillazioni verso lo stop.",
       "auto": false
     },
     {
@@ -88,9 +127,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score sopra -0.3, +1.5% da 8h, nessuna condizione di chiusura anticipata.",
-      "bull_case": "Score +0.68 e +1.5% di utile indicano trend ancora valido.",
-      "bear_case": "Score più vicino alla soglia di esplorazione, meno margine di sicurezza rispetto agli altri.",
+      "reason_model": "Nessuna violazione delle regole di uscita, score 0.68 e prezzo sopra entrata giustificano la tenuta.",
+      "bull_case": "In utile +1.7%, score 0.68 stabile dopo 8h.",
+      "bear_case": "Score più basso rispetto ad altre posizioni simili, margine di sicurezza ridotto.",
       "auto": false
     },
     {
@@ -101,9 +140,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "+2.7% da 7h con score ancora ben sopra soglia di uscita -0.3.",
-      "bull_case": "Miglior performance relativa (+2.7%) con score +0.60 ancora positivo.",
-      "bear_case": "Score più basso rispetto ad altre posizioni, potenziale primo candidato a un'uscita per debolezza se il punteggio scende.",
+      "reason_model": "Guadagno +2.7% e score 0.68 sopra soglia di uscita, si mantiene la posizione secondo le regole.",
+      "bull_case": "Miglior performance percentuale tra le esplorazioni, +2.7% in 8h.",
+      "bear_case": "Score 0.68 relativamente modesto rispetto al guadagno, rischio di ritracciamento rapido.",
       "auto": false
     },
     {
@@ -114,9 +153,9 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Nessun trigger di uscita: +1.9%, score +0.79, 6h di tenuta.",
-      "bull_case": "Score alto (+0.79) e +1.9% di utile, tra le posizioni più solide.",
-      "bear_case": "Nessuna in particolare, il rischio principale è un'inversione improvvisa di mercato.",
+      "reason_model": "Score 0.73 e +2.0% coerenti con una posizione sana, nessun segnale di uscita.",
+      "bull_case": "In utile +2.0%, score 0.73 solido dopo 6h.",
+      "bear_case": "Trend più giovane, meno tempo per confermare la tenuta.",
       "auto": false
     },
     {
@@ -127,74 +166,78 @@
       "reason": "hold: nessun ordine",
       "order": null,
       "explore": false,
-      "reason_model": "Score +0.55 ancora ampiamente sopra -0.3, nessuna azione richiesta per ora.",
-      "bull_case": "Aperta più di recente (3h) e già in utile (+1.3%).",
-      "bear_case": "Score più basso del portafoglio (+0.55), il più vicino relativamente alla soglia di uscita -0.3.",
+      "reason_model": "Score 0.59 resta sopra la soglia di uscita -0.3 e la posizione è in utile, si mantiene per ora.",
+      "bull_case": "In utile +1.4%, aperta di recente (3h).",
+      "bear_case": "Score 0.59 tra i più bassi, segnale in indebolimento relativo.",
       "auto": false
     }
   ],
-  "warnings": [
-    "ordine trd-20260927T0015Z-RENDERUSD-buy (buy RENDER/USD, aperto da 452 min): annullato",
-    "ordine trd-20260926T2315Z-POLUSD-buy (buy POL/USD, aperto da 511 min): annullato"
-  ],
-  "alerts": [
-    "ordine trd-20260927T0015Z-RENDERUSD-buy (buy RENDER/USD, aperto da 452 min): annullato",
-    "ordine trd-20260926T2315Z-POLUSD-buy (buy POL/USD, aperto da 511 min): annullato"
-  ],
-  "changed": "trd-20260927T0745Z-AVAXUSD-buy (placed)",
-  "outcome": "compra AVAX/USD: inviato",
-  "remaining_risk": "investito 3693.08$ (prima degli ordini di questo slot) su AAVEUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti",
-  "next_job": "Verificare se RENDER (score 0.79, ADX 26) supera la soglia 0.80 diventando buy pieno, controllare l'esito della nuova posizione AVAX aperta ora, e monitorare AAVE e YFI (score 0.58 e 0.55, i più bassi) per un eventuale avvicinamento alla soglia di uscita -0.3.",
-  "equity": 100015.2,
+  "warnings": [],
+  "alerts": [],
+  "changed": "trd-20260927T0800Z-RENDERUSD-buy (placed)",
+  "outcome": "compra RENDER/USD: inviato",
+  "remaining_risk": "investito 4287.47$ (prima degli ordini di questo slot) su AAVEUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti",
+  "next_job": "Controllare l'esito della nuova posizione RENDER appena aperta e verificare se qualche posizione esplorativa (specialmente AAVE e YFI con gli score più bassi) si avvicina alla soglia di uscita -0.3 o se emergono i primi trade chiusi utili per la riflessione.",
+  "equity": 100022.37,
   "error": "",
   "positions": [
     {
       "symbol": "AAVE/USD",
       "value": 491.61,
-      "stop": 149.85141381444953,
+      "stop": 150.11181281609853,
       "take_profit": 165.75183037279103,
       "entry_price": 155.3,
-      "price": 156.69,
+      "price": 156.735,
+      "exit": null,
+      "explore": true
+    },
+    {
+      "symbol": "AVAX/USD",
+      "value": 586.8,
+      "stop": 10.539733262017153,
+      "take_profit": 12.152900106974274,
+      "entry_price": 11.185,
+      "price": 11.137,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "BAT/USD",
       "value": 347.74,
-      "stop": 0.09072194629068409,
+      "stop": 0.09087290726906748,
       "take_profit": 0.10647106566735837,
       "entry_price": 0.0958502,
-      "price": 0.09611,
+      "price": 0.09645,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "DOT/USD",
       "value": 400.91,
-      "stop": 1.1950689420299099,
+      "stop": 1.1951079461706307,
       "take_profit": 1.3781207979963817,
       "entry_price": 1.24308,
-      "price": 1.2744,
+      "price": 1.27169,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "FIL/USD",
       "value": 485.96,
-      "stop": 1.0617947552593603,
+      "stop": 1.0688619155979775,
       "take_profit": 1.2990018659088813,
       "entry_price": 1.138,
-      "price": 1.14951,
+      "price": 1.15285,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "LINK/USD",
-      "value": 495.18,
-      "stop": 13.733354543534855,
+      "value": 498.69,
+      "stop": 13.786043504710937,
       "take_profit": 15.175744285783015,
       "entry_price": 14.1548,
-      "price": 14.37,
+      "price": 14.4023,
       "exit": null,
       "explore": true
     },
@@ -204,43 +247,43 @@
       "stop": 0.259845134216334,
       "take_profit": 0.2905411298734655,
       "entry_price": 0.2672,
-      "price": 0.27451,
+      "price": 0.2743,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "UNI/USD",
-      "value": 397.25,
+      "value": 401.34,
       "stop": 9.570583171458745,
       "take_profit": 10.703818506906753,
       "entry_price": 9.846,
-      "price": 10.033,
+      "price": 10.042,
       "exit": null,
       "explore": true
     },
     {
       "symbol": "YFI/USD",
       "value": 685.44,
-      "stop": 2427.5555117937283,
+      "stop": 2430.460546665605,
       "take_profit": 2622.26135795356,
       "entry_price": 2482.45,
-      "price": 2514.1,
+      "price": 2516.3,
       "exit": null,
       "explore": true
     }
   ],
-  "day_change_pct": 0.015199999999992997,
+  "day_change_pct": 0.022370000000004886,
   "market": {
     "coins": 31,
     "missing": [],
     "regime_ok": true,
-    "basket_7d_pct": 15.837819875510238,
-    "breadth_pct": 96.7741935483871
+    "basket_7d_pct": 17.408152781446187,
+    "breadth_pct": 100.0
   },
   "regime": "risk_on",
-  "market_view": "Il regime resta risk_on con momentum settimanale forte (+15.84%) ma nessun candidato pieno supera la soglia 0.80, mentre le 8 posizioni esplorative aperte restano tutte in utile e senza segnali di uscita, suggerendo un mercato positivo ma ancora privo di setup ad alta convinzione.",
-  "finished_at": "2026-09-27T07:48:09.144236+00:00",
-  "commit_message": "Record wake 20260927T0745Z ok",
+  "market_view": "Il mercato resta in risk_on con momentum settimanale forte e tutte le 9 posizioni esplorative in utile o quasi, ma nessun candidato pieno raggiunge la soglia 0.80, per cui l'unica nuova esposizione ragionevole è RENDER grazie al suo ADX 27 superiore agli altri due candidati esplorativi più deboli.",
+  "finished_at": "2026-09-27T08:02:58.747282+00:00",
+  "commit_message": "Record wake 20260927T0800Z ok",
   "notified": true,
   "notify_detail": "inviato"
 }

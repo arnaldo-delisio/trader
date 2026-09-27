@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T08:00:00+00:00 · ok
+
+- Avvio: 2026-09-27T08:02:18.267229+00:00  Fine: 2026-09-27T08:02:58.747282+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36304929071
+- Cosa è cambiato: trd-20260927T0800Z-RENDERUSD-buy (placed)
+- Esito: compra RENDER/USD: inviato
+- Rischio residuo: investito 4287.47$ (prima degli ordini di questo slot) su AAVEUSD, AVAXUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Controllare l'esito della nuova posizione RENDER appena aperta e verificare se qualche posizione esplorativa (specialmente AAVE e YFI con gli score più bassi) si avvicina alla soglia di uscita -0.3 o se emergono i primi trade chiusi utili per la riflessione.
+<!-- entry -->
 ## 2026-09-27T07:45:00+00:00 · ok
 
 - Avvio: 2026-09-27T07:47:38.421898+00:00  Fine: 2026-09-27T07:48:09.144236+00:00
