@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="data-version" content="0ec468b82696b238">
+<title>trader · cruscotto</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%2711%27 fill=%27%23181d29%27/%3E%3Cpath d=%27M8 27 L16 19 L22 24 L32 12%27 fill=%27none%27 stroke=%27%235b9cf5%27 stroke-width=%273.2%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0a0c11; --bg-2:#0e1118; --panel:#121620; --panel-2:#181d29; --line:#232a38; --line-2:#2c3445;
+  --ink:#eef1f7; --ink-2:#b4bccb; --muted:#7c8699; --accent:#5b9cf5;
+  --good:#3fcf8e; --bad:#f2616f; --warn:#f2b347; --violet:#a295f0; --calm:#7fa6d8;
+  --sans:"Inter","IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{font-size:18px}
+body{margin:0;background:radial-gradient(1200px 600px at 15% -10%,#15203a 0%,transparent 60%),
+  radial-gradient(900px 500px at 100% 0%,#1a1530 0%,transparent 55%),var(--bg);
+  color:var(--ink);font-family:var(--sans);line-height:1.45;-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1840px;margin:0 auto;padding:34px 40px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:18px}
+.brand svg{width:54px;height:54px;flex:none}
+.brand h1{margin:0;font-size:2.1rem;font-weight:700;letter-spacing:-.02em;line-height:1}
+.brand p{margin:6px 0 0;color:var(--ink-2);font-size:1.02rem}
+.brand p b{color:var(--warn);font-weight:600}
+.status{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.since{color:var(--muted);font-size:.95rem;margin-right:8px}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:7px 15px;border-radius:999px;font-size:.95rem;
+  font-weight:600;background:var(--panel-2);border:1px solid var(--line-2);color:var(--ink);white-space:nowrap}
+.pill i{width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
+.pill.good{color:var(--good);background:rgba(63,207,142,.09);border-color:rgba(63,207,142,.28)}
+.pill.bad{color:var(--bad);background:rgba(242,97,111,.1);border-color:rgba(242,97,111,.3)}
+.pill.warn{color:var(--warn);background:rgba(242,179,71,.1);border-color:rgba(242,179,71,.3)}
+.pill.violet{color:var(--violet);background:rgba(162,149,240,.1);border-color:rgba(162,149,240,.3)}
+.pill.calm{color:var(--calm);background:rgba(127,166,216,.09);border-color:rgba(127,166,216,.26)}
+.pill.dim{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:18px;margin-bottom:18px}
+.kpi{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:18px;
+  padding:20px 22px 18px;position:relative;overflow:hidden}
+.kpi .label{color:var(--ink-2);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.kpi .num{font-size:2.35rem;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;line-height:1.15;white-space:nowrap}
+.kpi .num small{font-size:1.3rem;color:var(--muted);font-weight:600}
+.kpi .num small.unit{margin-left:6px}
+.kpi .sub{color:var(--muted);font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--good)} .down{color:var(--bad)}
+.meter{height:6px;background:var(--line);border-radius:6px;margin-top:10px;overflow:hidden}
+.meter b{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#8ab8ff);border-radius:6px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.span4{grid-column:span 4}.span5{grid-column:span 5}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 26px 24px;min-width:0}
+.panel>header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
+.panel h2{margin:0;font-size:1rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.src{color:var(--muted);font-size:.9rem}
+.empty{color:var(--muted);font-size:1.05rem;margin:18px 0;padding:26px;border:1px dashed var(--line-2);border-radius:14px;text-align:center}
+.muted{color:var(--muted)}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .tick{fill:var(--muted);font-size:17px;font-family:var(--sans)}
+.chart .base{stroke:var(--muted);stroke-dasharray:6 7;stroke-width:1.4;opacity:.7}
+.chart .baselabel{fill:var(--ink-2);font-size:16px;paint-order:stroke;stroke:var(--panel);stroke-width:6px;stroke-linejoin:round}
+.chart .area{fill:url(#eqfill)}
+.chart .line{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dot{fill:var(--accent);stroke:var(--panel);stroke-width:3}
+.chart .halo{fill:var(--accent);opacity:.18}
+.chart .cross{stroke:var(--ink-2);stroke-width:1;opacity:0}
+.chart .hover{fill:var(--ink);stroke:var(--accent);stroke-width:3;opacity:0}
+.chart .tip{position:absolute;pointer-events:none;background:var(--panel-2);border:1px solid var(--line-2);
+  border-radius:10px;padding:8px 12px;font-size:.95rem;opacity:0;transform:translate(-50%,-120%);white-space:nowrap}
+.chart .tip b{display:block;font-size:1.1rem}
+.hohead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.hohead .slot{color:var(--ink-2);font-size:.95rem}
+.hohead a{margin-left:auto;font-size:.95rem}
+dl.handoff{margin:0;display:grid;gap:12px}
+dl.handoff dt{color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+dl.handoff dd{margin:2px 0 0;font-size:1.05rem;color:var(--ink)}
+.warns{margin:14px 0 0;padding:12px 14px 12px 32px;background:rgba(242,179,71,.07);border-radius:12px;color:var(--warn);font-size:.95rem}
+pre.progress{white-space:pre-wrap;font-family:var(--mono);font-size:.9rem;color:var(--ink-2);margin:0}
+table{width:100%;border-collapse:collapse}
+th{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;text-align:left;
+  padding:0 12px 12px;border-bottom:1px solid var(--line)}
+td{padding:15px 12px;border-bottom:1px solid var(--line);font-size:1.12rem;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+.r{text-align:right}
+td.sym{font-weight:700;font-size:1.2rem}
+td.sym small{color:var(--muted);font-weight:500;font-size:.9rem;margin-right:10px}
+td.strong{font-weight:600}
+td small{display:block;color:var(--muted);font-size:.85rem}
+td.sym small{display:inline}
+td.stop{color:#f59aa3} td.tp{color:#7fe0b4}
+th.bar,td.bar{width:30%;text-align:center}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:6px;background:rgba(242,179,71,.12);color:var(--warn);vertical-align:middle;margin-left:6px}
+.tag.prova{background:rgba(162,149,240,.14);color:var(--violet)}
+.tag.explore{background:rgba(92,184,230,.14);color:#7cc8ee}
+.range{position:relative;height:12px;border-radius:12px;margin:0 8px;
+  background:linear-gradient(90deg,rgba(242,97,111,.35),rgba(255,255,255,.07) 45%,rgba(63,207,142,.35))}
+.range .fill{position:absolute;left:0;top:0;bottom:0;border-radius:12px;opacity:.0}
+.range .entry{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink-2);margin-left:-1px;border-radius:2px}
+.range .now{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:var(--ink);
+  border:4px solid var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(91,156,245,.18)}
+.strip{display:flex;align-items:flex-end;gap:3px;overflow:hidden;height:74px;padding:4px 0}
+.strip .tick{flex:1;min-width:0;border-radius:4px 4px 2px 2px;background:var(--line-2);display:block;transition:opacity .15s}
+.strip .tick:hover{opacity:.7}
+.tick.good{background:var(--good)} .tick.bad{background:var(--bad)} .tick.warn{background:var(--warn)}
+.tick.calm{background:#3a4d6b} .tick.violet{background:var(--violet)} .tick.dim{background:#2b3140}
+.stripaxis{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.9rem;margin-top:10px;gap:16px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.lg{display:inline-flex;align-items:center;gap:7px;color:var(--ink-2)}
+.lg i{width:12px;height:12px;border-radius:3px;background:#2b3140}
+.lg.good i{background:var(--good)} .lg.bad i{background:var(--bad)} .lg.warn i{background:var(--warn)}
+.lg.calm i{background:#3a4d6b} .lg.violet i{background:var(--violet)}
+.lg b{color:var(--ink);font-weight:600}
+ul.wakes{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:36px}
+ul.wakes li{display:grid;grid-template-columns:128px 210px 90px 1fr auto;align-items:center;gap:12px;padding:10px 0;
+  border-top:1px solid var(--line);font-size:1rem}
+ul.wakes .slot{color:var(--ink-2);font-family:var(--mono);font-size:.95rem}
+ul.wakes .pill{font-size:.85rem;padding:4px 11px;justify-self:start}
+ul.wakes .orders{color:var(--ink-2);font-size:.92rem}
+ul.wakes .note{color:var(--muted);font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trades{display:grid;gap:14px}
+.trade{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:16px 20px}
+.thead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.side{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:7px}
+.side.buy{background:rgba(63,207,142,.14);color:var(--good)} .side.sell{background:rgba(242,97,111,.14);color:var(--bad)}
+.side.hold{background:var(--panel-2);color:var(--muted)}
+.tsym{font-weight:700;font-size:1.2rem}
+.tmeta{color:var(--ink-2);font-size:1rem}
+.twhen{margin-left:auto;color:var(--muted);font-size:.92rem;font-family:var(--mono)}
+.why{margin:10px 0 0;font-size:1.05rem;color:var(--ink)}
+.why b{color:var(--ink-2);font-weight:600}
+.probe{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.probe>div{border-radius:12px;padding:10px 14px;font-size:.98rem;color:var(--ink-2)}
+.probe span{display:block;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.pro{background:rgba(63,207,142,.07);border-left:3px solid var(--good)} .pro span{color:var(--good)}
+.con{background:rgba(242,97,111,.07);border-left:3px solid var(--bad)} .con span{color:var(--bad)}
+.tfoot{margin:10px 0 0;color:var(--muted);font-size:.9rem}
+.lesson{padding:14px 0;border-top:1px solid var(--line)}
+.lesson:first-child{border-top:0;padding-top:0}
+.lesson h3{margin:0 0 8px;font-size:.9rem;font-weight:600;color:var(--muted);font-family:var(--mono)}
+.lesson ul{margin:0;padding-left:22px}
+.lesson li{margin:5px 0;font-size:1.04rem;color:var(--ink-2)}
+.lesson.newest li{color:var(--ink);font-size:1.1rem}
+.lesson.newest h3{color:var(--violet)}
+.pmini{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.pmini div{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.pmini span{display:block;color:var(--muted);font-size:.78rem;line-height:1.25;min-height:2em}
+.pmini b{font-size:1.35rem}
+.change{padding:14px 0;border-top:1px solid var(--line)}
+.chead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.chead .pill{font-size:.82rem;padding:4px 11px}
+.pname{font-weight:700;font-size:1.08rem}
+.mono{font-family:var(--mono);color:var(--muted);font-size:.85rem}
+.delta{display:flex;align-items:baseline;gap:12px;margin:8px 0 2px;font-size:1.3rem}
+.delta .old{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.delta .arrow{color:var(--muted)}
+.delta .new{font-weight:700}
+.score{font-size:.92rem;margin-left:10px}
+.reason{margin:4px 0 0;color:var(--ink-2);font-size:1rem}
+.rej{margin:4px 0 0;color:#f59aa3;font-size:.95rem}
+.change.rejected .new{color:var(--ink-2)}
+.killrow{margin-bottom:12px}
+ul.limits{list-style:none;margin:0;padding:0}
+ul.limits li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
+.lname{color:var(--ink-2);font-size:1.02rem}
+.lval{font-weight:700;font-size:1.2rem;text-align:right}
+.lval small{display:block;font-weight:500;font-size:.8rem;color:var(--muted)}
+.syms{color:var(--ink-2);font-size:.95rem;margin:14px 0 0}
+ul.fixed{margin:14px 0 0;padding-left:20px;color:var(--muted);font-size:.95rem}
+.foot{margin-top:26px;color:var(--muted);font-size:.9rem;text-align:center}
+.problems{display:inline-block;text-align:left;color:var(--warn);background:rgba(242,179,71,.07);border-radius:12px;padding:10px 16px 10px 34px}
+@media (max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.span4,.span5,.span7,.span8{grid-column:span 12}
+  ul.wakes{grid-template-columns:1fr}}
+@media (max-width:700px){html{font-size:15px}.strip{gap:1px}.top{align-items:flex-start}.stripaxis{flex-wrap:wrap}.wrap{padding:20px 16px}.kpis{grid-template-columns:1fr 1fr}
+  ul.wakes li{grid-template-columns:1fr auto}ul.wakes .note,ul.wakes .orders{display:none}
+  .probe{grid-template-columns:1fr}.pmini{grid-template-columns:1fr 1fr}.positions{display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--panel-2)"/>
+        <path d="M8 27 L16 19 L22 24 L32 12" fill="none" stroke="var(--accent)" stroke-width="3.2"
+          stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="12" r="3" fill="var(--good)"/></svg>
+      <div><h1>trader</h1><p>Agente autonomo di trading crypto · conto Alpaca <b>paper</b>, soldi finti</p></div>
+    </div>
+    <div class="status"><span class="pill dim"><i></i>ultimo risveglio: Slot già eseguito</span><span class="since"><span class="ago" data-ts="2026-09-27T00:30:00+00:00">27/09 00:30 UTC</span></span><span class="pill good"><i></i>Jev: Propenso al rischio ×1,0</span></div>
+  </header>
+  <div class="kpis"><div class="kpi"><div class="label">Patrimonio</div><div class="num ">99.981,82<small class="unit">$</small></div><div class="sub">conto paper, soldi finti</div></div><div class="kpi"><div class="label">Oggi</div><div class="num down">−0,02%</div><div class="sub">−18,18 $</div></div><div class="kpi"><div class="label">Dall&#x27;inizio</div><div class="num down">−0,02%</div><div class="sub">−18,05 $</div></div><div class="kpi"><div class="label">Investito</div><div class="num ">0,0%</div><div class="sub">0 $ · tetto 60%</div><div class="meter"><b style="width:0.0%"></b></div></div><div class="kpi"><div class="label">Posizioni</div><div class="num ">7<small> / 10</small></div><div class="sub">aperte, ognuna con stop</div></div><div class="kpi"><div class="label">Operazioni chiuse</div><div class="num ">2</div><div class="sub">vinte 0% · netto −0,13 $</div></div></div>
+  <div class="grid">
+    <section class="panel span8"><header><h2>Patrimonio</h2><span class="src">fonte: record dei risvegli</span></header><div class="body"><div class="chart" data-points="[[96.0,62.5,&quot;26/09 22:31&quot;,&quot;99.999,87\u00a0$&quot;],[494.4,62.5,&quot;26/09 23:16&quot;,&quot;99.999,87\u00a0$&quot;],[784.8,171.6,&quot;26/09 23:49&quot;,&quot;99.992,66\u00a0$&quot;],[832.8,291.8,&quot;26/09 23:55&quot;,&quot;99.984,72\u00a0$&quot;],[885.2,291.8,&quot;27/09 00:01&quot;,&quot;99.984,72\u00a0$&quot;],[1017.7,383.5,&quot;27/09 00:16&quot;,&quot;99.978,66\u00a0$&quot;],[1026.5,383.5,&quot;27/09 00:17&quot;,&quot;99.978,66\u00a0$&quot;],[1162.2,352.2,&quot;27/09 00:32&quot;,&quot;99.980,73\u00a0$&quot;],[1172.0,335.7,&quot;27/09 00:33&quot;,&quot;99.981,82\u00a0$&quot;]]"><svg viewBox="0 0 1200 470" role="img" aria-label="Andamento del patrimonio"><defs><linearGradient id="eqfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".32"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><line class="grid" x1="96" x2="1172" y1="363.2" y2="363.2"/><text class="tick" x="82" y="369.2" text-anchor="end">99.980</text><line class="grid" x1="96" x2="1172" y1="211.9" y2="211.9"/><text class="tick" x="82" y="217.9" text-anchor="end">99.990</text><line class="grid" x1="96" x2="1172" y1="60.5" y2="60.5"/><text class="tick" x="82" y="66.5" text-anchor="end">100.000</text><line class="base" x1="96" x2="1172" y1="62.5" y2="62.5"/><text class="baselabel" x="106" y="86.5">valore iniziale 100.000 $</text><path class="area" d="M96.0,62.5 L494.4,62.5 L784.8,171.6 L832.8,291.8 L885.2,291.8 L1017.7,383.5 L1026.5,383.5 L1162.2,352.2 L1172.0,335.7 L1172.0,422 L96.0,422 Z"/><path class="line" d="M96.0,62.5 L494.4,62.5 L784.8,171.6 L832.8,291.8 L885.2,291.8 L1017.7,383.5 L1026.5,383.5 L1162.2,352.2 L1172.0,335.7"/><circle class="halo" cx="1172.0" cy="335.7" r="12"/><circle class="dot" cx="1172.0" cy="335.7" r="6"/><text class="tick" x="96.0" y="456" text-anchor="start">26/09 22:31</text><text class="tick" x="311.2" y="456" text-anchor="middle">26/09 22:56</text><text class="tick" x="526.4" y="456" text-anchor="middle">26/09 23:20</text><text class="tick" x="741.6" y="456" text-anchor="middle">26/09 23:44</text><text class="tick" x="956.8" y="456" text-anchor="middle">27/09 00:09</text><text class="tick" x="1172.0" y="456" text-anchor="end">27/09 00:33</text><line class="cross" x1="0" x2="0" y1="24" y2="422"/><circle class="hover" r="7" cx="-20" cy="-20"/></svg><div class="tip"></div></div></div></section>
+    <section class="panel span4"><header><h2>Ultimo passaggio di consegne</h2></header><div class="body"><div class="hohead"><span class="pill dim"><i></i>Slot già eseguito</span><span class="slot">slot 27/09 00:30</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36282842564" target="_blank" rel="noopener">apri il run ↗</a></div><dl class="handoff"><dt>Esito</dt><dd>slot già eseguito (1 ordini con questo slot): nessun nuovo ordine</dd><dt>Rischio residuo</dt><dd>investito 2089.44$ (prima degli ordini di questo slot) su BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD; 2 ordini aperti</dd><dt>Prossimo compito</dt><dd>Controllare se BAT (score 0.81, -1.1%), DOT, FIL, LINK e la nuova SUSHI hanno toccato stop/take-profit o si avvicinano alla scadenza di 168h, e verificare se POL (score 0.78) o RENDER hanno superato la soglia 0.80 diventando buy pieno.&lt;/next_job&gt;
+&lt;/invoke&gt;
+</dd></dl><ul class="warns"><li>slot già visto nell&#x27;ultimo handoff: esecuzione ripetuta o sovrapposta</li></ul></div></section>
+    <section class="panel span12"><header><h2>Posizioni aperte</h2></header><div class="body"><table class="positions"><thead><tr><th>Moneta</th><th class="r">Valore</th><th class="r">Ingresso</th><th class="r">Prezzo</th><th class="r">P&amp;L</th><th class="r">Stop</th><th class="bar">stop → take profit</th><th class="r">Take profit</th></tr></thead><tbody><tr><td class="sym">BAT<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">0,09585</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">0,08906<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:39.0%" title="ingresso"></i></div></td><td class="r tp">0,1065</td></tr><tr><td class="sym">DOT<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">1,243</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">1,156<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:39.2%" title="ingresso"></i></div></td><td class="r tp">1,378</td></tr><tr><td class="sym">FIL<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">1,138</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">1,033<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:39.4%" title="ingresso"></i></div></td><td class="r tp">1,299</td></tr><tr><td class="sym">LINK<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">14,155</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">13,474<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:40.0%" title="ingresso"></i></div></td><td class="r tp">15,176</td></tr><tr><td class="sym">POL<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">0,1206</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">0,1135<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:40.0%" title="ingresso"></i></div></td><td class="r tp">0,1313</td></tr><tr><td class="sym">RENDER<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">2,003</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">1,870<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:40.0%" title="ingresso"></i></div></td><td class="r tp">2,201</td></tr><tr><td class="sym">SUSHI<small>/USD</small><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span></td><td class="r">n/d</td><td class="r">0,2672</td><td class="r strong">n/d</td><td class="r ">n/d</td><td class="r stop">0,2516<small>n/d</small></td><td class="bar"><div class="range"><i class="entry" style="left:40.0%" title="ingresso"></i></div></td><td class="r tp">0,2905</td></tr></tbody></table></div></section>
+    <section class="panel span12"><header><h2>Risvegli</h2><span class="src">ogni 15 minuti, riflessione ogni 6 ore</span></header><div class="body"><div class="strip"><a class="tick calm" style="height:62%" title="26/09 22:30 · Nessun ordine" href="https://github.com/arnaldo-delisio/trader/actions/runs/36276557728" target="_blank" rel="noopener"></a><span class="tick violet" style="height:80%" title="26/09 22:30 · Riflessione"></span><a class="tick good" style="height:100%" title="26/09 23:15 · Completato · 2 ordini" href="https://github.com/arnaldo-delisio/trader/actions/runs/36278895442" target="_blank" rel="noopener"></a><a class="tick good" style="height:100%" title="26/09 23:45 · Completato · 2 ordini" href="https://github.com/arnaldo-delisio/trader/actions/runs/36280572775" target="_blank" rel="noopener"></a><a class="tick dim" style="height:62%" title="26/09 23:45 · Slot già eseguito" href="https://github.com/arnaldo-delisio/trader/actions/runs/36280894061" target="_blank" rel="noopener"></a><a class="tick good" style="height:100%" title="27/09 00:00 · Completato · 1 ordini" href="https://github.com/arnaldo-delisio/trader/actions/runs/36281152193" target="_blank" rel="noopener"></a><span class="tick violet" style="height:80%" title="27/09 00:00 · Riflessione"></span><a class="tick good" style="height:100%" title="27/09 00:15 · Completato · 1 ordini" href="https://github.com/arnaldo-delisio/trader/actions/runs/36281931467" target="_blank" rel="noopener"></a><a class="tick dim" style="height:62%" title="27/09 00:15 · Slot già eseguito" href="https://github.com/arnaldo-delisio/trader/actions/runs/36282018874" target="_blank" rel="noopener"></a><a class="tick good" style="height:100%" title="27/09 00:30 · Completato · 1 ordini" href="https://github.com/arnaldo-delisio/trader/actions/runs/36282763141" target="_blank" rel="noopener"></a><a class="tick dim" style="height:62%" title="27/09 00:30 · Slot già eseguito" href="https://github.com/arnaldo-delisio/trader/actions/runs/36282842564" target="_blank" rel="noopener"></a></div><div class="stripaxis"><span>26/09 22:30</span><div class="legend"><span class="lg good"><i></i>Completato <b>5</b></span><span class="lg dim"><i></i>Slot già eseguito <b>3</b></span><span class="lg violet"><i></i>Riflessione <b>2</b></span><span class="lg calm"><i></i>Nessun ordine <b>1</b></span></div><span>27/09 00:30</span></div><ul class="wakes"><li><span class="slot">27/09 00:30</span><span class="pill dim"><i></i>Slot già eseguito</span><span class="orders"></span><span class="note">slot già eseguito (1 ordini con questo slot): nessun nuovo ordine</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36282842564" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">27/09 00:30</span><span class="pill good"><i></i>Completato</span><span class="orders">1 ordine</span><span class="note">Il mercato crypto resta in tendenza rialzista diffusa (regime risk_on, paniere 7g +12.41%, trend 4h al 100%) ma i punteggi delle nuove candidate restano tutti sotto la soglia piena di ingresso, segno di un momentum ancora immaturo per conferme forti.</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36282763141" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">27/09 00:15</span><span class="pill dim"><i></i>Slot già eseguito</span><span class="orders"></span><span class="note">slot già eseguito (1 ordini con questo slot): nessun nuovo ordine</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36282018874" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">27/09 00:15</span><span class="pill good"><i></i>Completato</span><span class="orders">1 ordine</span><span class="note">Il mercato resta in risk_on con trend 4h positivo diffuso ma nessun candidato raggiunge la soglia piena 0.80, quindi il momentum è ampio ma non abbastanza selettivo per convinzione forte, mentre le posizioni esplorative aperte oscillano lievemente in negativo senza toccare gli stop.</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36281931467" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">27/09 00:00</span><span class="pill violet"><i></i>Riflessione</span><span class="orders"></span><span class="note"></span><span class="muted">locale</span></li><li><span class="slot">27/09 00:00</span><span class="pill good"><i></i>Completato</span><span class="orders">1 ordine</span><span class="note">Il mercato crypto resta in risk_on con trend 4h positivo al 100% sul paniere, ma nessun candidato supera ancora la soglia d&#x27;ingresso piena (0.80), segno che il momentum è diffuso ma non abbastanza forte da generare convinzione alta; le posizioni esplorazione aperte oscillano lievemente in negativo s</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36281152193" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">26/09 23:45</span><span class="pill dim"><i></i>Slot già eseguito</span><span class="orders"></span><span class="note">slot già eseguito (2 ordini con questo slot): nessun nuovo ordine</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36280894061" target="_blank" rel="noopener">run ↗</a></li><li><span class="slot">26/09 23:45</span><span class="pill good"><i></i>Completato</span><span class="orders">2 ordini</span><span class="note">Il mercato crypto resta in trend rialzista diffuso (97% in tendenza 4h, paniere 7g +12.20%, regime risk_on) ma nessun candidato supera ancora la soglia di ingresso 0.80, quindi conviene continuare a esplorare con size ridotte sui segnali piu forti (FIL, DOT) piuttosto che restare del tutto in liquid</span><a href="https://github.com/arnaldo-delisio/trader/actions/runs/36280572775" target="_blank" rel="noopener">run ↗</a></li></ul></div></section>
+    <div class="col span7">
+      <section class="panel "><header><h2>Ultime operazioni</h2><span class="src">migliore −0,5% BTC/USD · peggiore −0,8% BTC/USD</span></header><div class="body"><div class="trades"><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">SUSHI/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">400,00 $ @ 0,2673</span><span class="twhen">27/09 00:32</span></div><p class="why">Trend confermato su due timeframe, ADX 26 sopra la soglia di rumore, costo giro 0.67% ampiamente coperto da un take-profit a +8.8% dall&#x27;entrata: buy esplorativo di taglia ridotta (400$ su max 999.80$).</p><div class="probe"><div class="pro"><span>pro</span>Trend 4h e 1h entrambi a +1.00 con ADX 26 (trend valido) e costo di giro basso allo 0.67%, RSI 57 non ipercomprato.</div><div class="con"><span>contro</span>Score 0.62 resta sotto la soglia di ingresso 0.80, quindi il segnale non è ancora pienamente confermato.</div></div><p class="tfoot">stop 0,2516 · take profit 0,2905 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36282763141" target="_blank" rel="noopener">run</a></p></article><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">RENDER/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">300,00 $</span><span class="twhen">27/09 00:16</span></div><p class="why">Score 0.64 e 7g +26.4% sono i migliori del gruppo esplorativo, ADX 27 accettabile; apro una posizione piccola (300$, ben sotto il massimo 999.78$) per raccogliere un altro esito utile alla riflessione.</p><div class="probe"><div class="pro"><span>pro</span>Score 0.64 è il più alto tra le esplorazioni, con trend 4h e 1h entrambi +1.00 e un forte +26.4% a 7 giorni che segnala momentum robusto.</div><div class="con"><span>contro</span>ADX 27 non è fortissimo e il punteggio resta comunque sotto la soglia 0.80, quindi la convinzione statistica è limitata.</div></div><p class="tfoot">stop 1,870 · take profit 2,201 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36281931467" target="_blank" rel="noopener">run</a></p></article><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">LINK/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">500,00 $ @ 14,170</span><span class="twhen">27/09 00:01</span></div><p class="why">ADX 40 e RSI 54 su LINK sono il miglior equilibrio trend/rischio tra le esplorazioni; apro metà del massimo (500$ su 999.84$) per raccogliere un altro data point senza sovraesporre il bucket esplorazione (attualmente 1209.89$ su equity).</p><div class="probe"><div class="pro"><span>pro</span>ADX 40 indica un trend forte e confermato, RSI 54 lascia margine, costo giro 0.75% basso rispetto al setup.</div><div class="con"><span>contro</span>Punteggio 0.64 resta sotto la soglia 0.80 e il campione di trade chiusi è ancora zero, quindi la convinzione statistica è debole.</div></div><p class="tfoot">stop 13,474 · take profit 15,176 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36281152193" target="_blank" rel="noopener">run</a></p></article><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">FIL/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">500,00 $ @ 1,138</span><span class="twhen">26/09 23:49</span></div><p class="why">Score 0.76 il piu alto tra le esplorazioni, ADX 41 conferma trend solido, rapporto rischio/rendimento favorevole (stop -9.5% ATR vs take-profit +14.2% ATR) contro un costo giro di solo 0.82%.</p><div class="probe"><div class="pro"><span>pro</span>Punteggio 0.76 quasi alla soglia, ADX 41 e trend 4h/1h a +1.00 con 7g +16.3% indicano un momentum forte e persistente.</div><div class="con"><span>contro</span>RSI a 55 non e ancora ipercomprato ma il rally recente (+7% in 24h) potrebbe subire una correzione tecnica prima di continuare.</div></div><p class="tfoot">stop 1,031 · take profit 1,299 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36280572775" target="_blank" rel="noopener">run</a></p></article><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">DOT/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">400,00 $ @ 1,245</span><span class="twhen">26/09 23:49</span></div><p class="why">ATR contenuto (1.82%) rende lo stop (-7.3%) e il take-profit (+10.9%) ben calibrati, con costo giro basso (0.68%) che lascia margine di profitto anche su size ridotta.</p><div class="probe"><div class="pro"><span>pro</span>ADX 40 e trend 4h/1h pieni a +1.00 con costo giro basso (0.68%) offrono un buon rapporto tra segnale e costi di transazione.</div><div class="con"><span>contro</span>Score 0.69 piu distante dalla soglia di ingresso reale e il 24h +1.5% suggerisce un momentum piu debole rispetto agli altri candidati.</div></div><p class="tfoot">stop 1,153 · take profit 1,378 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36280572775" target="_blank" rel="noopener">run</a></p></article><article class="trade"><div class="thead"><span class="side buy">compra</span><span class="tsym">BAT/USD</span><span class="tag explore" title="sotto la soglia d'ingresso, piccola e con tetti propri">esplorazione</span><span class="tmeta">350,00 $ @ 0,09570</span><span class="twhen">26/09 23:16</span></div><p class="why">Score 0.81 il migliore, ADX 56 e RSI 64 giustificano una piccola posizione esplorativa nonostante il filtro sul movimento atteso (11.11% &lt; 13.21%); regime neutrale con confidenza 0.52 suggerisce size ridotta rispetto al massimo 699.99$.</p><div class="probe"><div class="pro"><span>pro</span>Punteggio più alto del gruppo (0.81), ADX 56 indica un trend fortissimo e RSI 64 non è ancora ipercomprato, con momentum a 7g del +18.2%.</div><div class="con"><span>contro</span>ATR 1.85% e costo giro 1.10% sono i più alti delle tre candidate esplorative, quindi uno stop può scattare rapidamente sulla volatilità.</div></div><p class="tfoot">stop 0,08877 · take profit 0,1065 · gate: ammesso · <a href="https://github.com/arnaldo-delisio/trader/actions/runs/36278895442" target="_blank" rel="noopener">run</a></p></article></div></div></section>
+      <section class="panel "><header><h2>Parametri: modifiche proposte</h2></header><div class="body"><div class="pmini"><div><span>Soglia di entrata</span><b>0,800</b></div><div><span>Stop (multipli di ATR)</span><b>4</b></div><div><span>Take profit (multipli di ATR)</span><b>6</b></div><div><span>Simboli in lista corta</span><b>8</b></div><div><span>Margine minimo sulle commissioni</span><b>12</b></div></div><p class="empty">Nessuna modifica proposta finora. Ogni proposta passa da limiti nel codice e da un backtest.</p></div></section>
+    </div>
+    <div class="col span5">
+      <section class="panel "><header><h2>Lezioni imparate</h2></header><div class="body"><div class="lesson newest"><h3>2026-09-27 00:01 UTC · slot 20260927T0000Z</h3><ul><li>Ancora 0 trade chiusi: non esiste base statistica per modificare pesi, soglie o stop/TP; qualsiasi cambiamento ora sarebbe ottimizzazione sul rumore.</li><li>Diverse posizioni esplorative sono aperte (BAT, POL, FIL, DOT, LINK) ma nessuna è ancora chiusa: attendere gli esiti (stop/TP/scadenza) prima di valutare se la soglia entry_threshold=0.80 è troppo restrittiva rispetto ai punteggi osservati (0.62-0.81).</li><li>Il modello nota ripetutamente score vicini ma sotto soglia (0.76, 0.77, 0.81) senza mai raggiungere 0.80 pieno: utile tracciare quante di queste esplorazioni chiuderanno in profitto per capire se abbassare la soglia, ma servono almeno ~10 trade chiusi prima di agire.</li><li>Nessun trade chiuso =&gt; nessuna attribuzione per segnale disponibile; mantenere invariati tutti i pesi finché non si osservano risultati reali collegati ai segnali positivi.</li></ul></div><div class="lesson"><h3>2026-09-26 22:31 UTC · slot 20260926T2230Z</h3><ul><li>Non ci sono trade chiusi (0) né dati di attribuzione sui segnali: non c&#x27;è alcuna base statistica per modificare pesi o soglie, quindi non propongo cambiamenti in questa riflessione.</li><li>Con 0 trade anche l&#x27;unico wake registrato è &#x27;no_trade&#x27;: prima di intervenire sui parametri serve osservare almeno una decina di trade chiusi per distinguere segnale da rumore.</li><li>Mantenere i parametri attuali invariati fino a quando non si accumula un campione minimo di operazioni, per evitare di ottimizzare sul rumore.</li></ul></div></div></section>
+      <section class="panel "><header><h2>Limiti rigidi in vigore</h2></header><div class="body"><div class="killrow"><span class="pill good"><i></i>kill switch spento</span></div><ul class="limits"><li><span class="lname">Investito al massimo</span><span class="lval">60 %<small>tetto nel codice 60 %</small></span></li><li><span class="lname">Massimo per moneta</span><span class="lval">8 %<small>tetto nel codice 8 %</small></span></li><li><span class="lname">Massimo per memecoin</span><span class="lval">3 %<small>tetto nel codice 3 %</small></span></li><li><span class="lname">Posizioni aperte al massimo</span><span class="lval">10<small>tetto nel codice 10</small></span></li><li><span class="lname">Ordini per risveglio</span><span class="lval">3<small>tetto nel codice 5</small></span></li><li><span class="lname">Perdita giornaliera: stop agli acquisti</span><span class="lval">5 %<small>tetto nel codice 5 %</small></span></li><li><span class="lname">Ordine minimo</span><span class="lval">10 $<small>minimo nel codice 10 $</small></span></li><li><span class="lname">Esplorazione: per posizione</span><span class="lval">1 %<small>tetto nel codice 1 %</small></span></li><li><span class="lname">Esplorazione: in totale</span><span class="lval">5 %<small>tetto nel codice 5 %</small></span></li></ul><p class="syms"><b>31</b> simboli ammessi: AAVE, ADA, ARB, AVAX, BAT, BCH, BONK, BTC, CRV, DOGE, DOT, ETH, FIL, GRT, HYPE, LDO, LINK, LTC, ONDO, POL, RENDER, SHIB, SKY, SOL, SUSHI, TRUMP, UNI, WIF, XRP, XTZ, YFI</p><ul class="fixed"><li>Niente vendite allo scoperto</li><li>Solo conto paper</li><li>Controllo della liquidità prima di ogni acquisto</li><li>Le uscite (stop e take profit) valgono a ogni risveglio, qualunque cosa dica il modello</li></ul></div></section>
+    </div>
+  </div>
+  <footer class="foot">
+    
+    <p>Generata dai record del repo il 27/09/2026 alle 01:01 UTC ·
+    si aggiorna da sola ogni 60 secondi · versione dati 0ec468b82696b238</p>
+  </footer>
+</div>
+<script>
+(function(){
+  // Relative times ("12 min fa"), kept current without reloading.
+  function rel(ts){
+    var s=(Date.now()-Date.parse(ts))/1000;
+    if(!isFinite(s))return "";
+    if(s<60)return "adesso";
+    if(s<3600)return Math.round(s/60)+" min fa";
+    if(s<86400)return Math.round(s/3600)+" ore fa";
+    return Math.round(s/86400)+" giorni fa";
+  }
+  function tick(){document.querySelectorAll(".ago").forEach(function(el){
+    var r=rel(el.dataset.ts); if(r){el.textContent=r;}});}
+  tick(); setInterval(tick,30000);
+
+  // Crosshair and tooltip on the equity curve.
+  document.querySelectorAll(".chart[data-points]").forEach(function(box){
+    var pts=JSON.parse(box.dataset.points), svg=box.querySelector("svg"), tip=box.querySelector(".tip"),
+        cross=svg.querySelector(".cross"), dot=svg.querySelector(".hover");
+    function hide(){tip.style.opacity=0;cross.style.opacity=0;dot.style.opacity=0;}
+    svg.addEventListener("mouseleave",hide);
+    svg.addEventListener("mousemove",function(ev){
+      var r=svg.getBoundingClientRect(), vb=svg.viewBox.baseVal, x=(ev.clientX-r.left)/r.width*vb.width;
+      var lo=0,hi=pts.length-1;
+      while(hi-lo>1){var mid=(lo+hi)>>1; if(pts[mid][0]<x)lo=mid;else hi=mid;}
+      var p=Math.abs(pts[lo][0]-x)<Math.abs(pts[hi][0]-x)?pts[lo]:pts[hi];
+      cross.setAttribute("x1",p[0]);cross.setAttribute("x2",p[0]);cross.style.opacity=.5;
+      dot.setAttribute("cx",p[0]);dot.setAttribute("cy",p[1]);dot.style.opacity=1;
+      tip.innerHTML="<b></b><span></span>";tip.firstChild.textContent=p[3];tip.lastChild.textContent=p[2]+" UTC";
+      tip.style.left=(p[0]/vb.width*r.width)+"px";tip.style.top=(p[1]/vb.height*r.height)+"px";tip.style.opacity=1;
+    });
+  });
+
+  // Every 60 s: reload only if the records changed (the build writes a new version).
+  var mine=document.querySelector('meta[name="data-version"]').content;
+  setInterval(function(){
+    fetch("data.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){if(d.version&&d.version!==mine){location.reload();}}).catch(function(){});
+  },60000);
+})();
+</script>
+</body>
+</html>
