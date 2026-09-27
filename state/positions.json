@@ -122,15 +122,15 @@
       "take_profit": 0.5965266158916397
     },
     "POL/USD": {
-      "atr_at_entry": 0.0013983449406957513,
-      "client_order_id": "trd-20260927T1545Z-POLUSD-buy",
-      "entry_at": "2026-09-27 15:47 UTC",
-      "entry_price": 0.12075,
-      "entry_t": 1790524063,
+      "atr_at_entry": 0.0014034988735031986,
+      "client_order_id": "trd-20260927T1630Z-POLUSD-buy",
+      "entry_at": "2026-09-27 16:32 UTC",
+      "entry_price": 0.12067,
+      "entry_t": 1790526763,
       "explore": true,
-      "highest": 0.12075,
-      "stop": 0.115156620237217,
-      "take_profit": 0.12914006964417452
+      "highest": 0.12067,
+      "stop": 0.1150560045059872,
+      "take_profit": 0.1290909932410192
     },
     "SOL/USD": {
       "atr_at_entry": 1.0254000928195113,
@@ -188,5 +188,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T16:17:26.857115+00:00"
+  "updated_at": "2026-09-27T16:32:43.280197+00:00"
 }

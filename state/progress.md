@@ -3,6 +3,16 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T16:30:00+00:00 · ok
+
+- Avvio: 2026-09-27T16:32:43.280063+00:00  Fine: 2026-09-27T16:33:26.818202+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36333621410
+- Cosa è cambiato: trd-20260927T1630Z-POLUSD-buy (placed)
+- Esito: compra POL/USD: inviato
+- Rischio residuo: investito 7655.86$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, GRTUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Controllare se ARB (score -0.11, -5.3%, vicino allo stop 0.216037) o UNI (-2.1%, vicino allo stop 9.57058) hanno toccato lo stop o sono scesi sotto la soglia di uscita -0.3, e verificare l'esito della nuova posizione esplorativa su POL aperta in questo slot.
+- Attenzione: ordine trd-20260927T1600Z-WIFUSD-buy (buy WIF/USD, aperto da 29 min): annullato
+<!-- entry -->
 ## 2026-09-27T16:15:00+00:00 · ok
 
 - Avvio: 2026-09-27T16:17:26.856978+00:00  Fine: 2026-09-27T16:18:36.138007+00:00
