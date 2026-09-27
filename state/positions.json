@@ -41,7 +41,7 @@
       "entry_t": 1790464582,
       "explore": true,
       "highest": 0.0978995,
-      "stop": 0.09252168725982497,
+      "stop": 0.09262609905868162,
       "take_profit": 0.10647106566735837
     },
     "BONK/USD": {
@@ -85,19 +85,8 @@
       "entry_t": 1790466519,
       "explore": true,
       "highest": 1.1566,
-      "stop": 1.0880781699174507,
+      "stop": 1.0901494385165817,
       "take_profit": 1.2990018659088813
-    },
-    "GRT/USD": {
-      "atr_at_entry": 0.0003806106475612174,
-      "client_order_id": "trd-20260927T1500Z-GRTUSD-buy",
-      "entry_at": "2026-09-27 15:02 UTC",
-      "entry_price": 0.028413,
-      "entry_t": 1790521353,
-      "explore": true,
-      "highest": 0.03321865,
-      "stop": 0.030375040880323338,
-      "take_profit": 0.030696663885367306
     },
     "LINK/USD": {
       "atr_at_entry": 0.17015738096383587,
@@ -122,15 +111,26 @@
       "take_profit": 0.6042801164366948
     },
     "POL/USD": {
-      "atr_at_entry": 0.0013573560874487955,
-      "client_order_id": "trd-20260927T1730Z-POLUSD-buy",
-      "entry_at": "2026-09-27 17:44 UTC",
-      "entry_price": 0.120333,
-      "entry_t": 1790531070,
+      "atr_at_entry": 0.0015476943345646144,
+      "client_order_id": "trd-20260927T2315Z-POLUSD-buy",
+      "entry_at": "2026-09-27 23:18 UTC",
+      "entry_price": 0.12148,
+      "entry_t": 1790551131,
       "explore": true,
-      "highest": 0.120333,
-      "stop": 0.11490357565020481,
-      "take_profit": 0.12847713652469278
+      "highest": 0.12148,
+      "stop": 0.11528922266174155,
+      "take_profit": 0.1307661660073877
+    },
+    "SKY/USD": {
+      "atr_at_entry": 0.0014328781478081865,
+      "client_order_id": "trd-20260927T2315Z-SKYUSD-buy",
+      "entry_at": "2026-09-27 23:18 UTC",
+      "entry_price": 0.08131,
+      "entry_t": 1790551131,
+      "explore": false,
+      "highest": 0.08131,
+      "stop": 0.07557848740876724,
+      "take_profit": 0.0899072688868491
     },
     "SOL/USD": {
       "atr_at_entry": 1.0254000928195113,
@@ -162,7 +162,7 @@
       "entry_t": 1790473584,
       "explore": true,
       "highest": 10.13055,
-      "stop": 9.591210036160573,
+      "stop": 9.602975337723157,
       "take_profit": 10.703818506906753
     },
     "YFI/USD": {
@@ -177,5 +177,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T20:27:02.946027+00:00"
+  "updated_at": "2026-09-27T23:18:51.932695+00:00"
 }

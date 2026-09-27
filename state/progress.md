@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T23:15:00+00:00 · ok
+
+- Avvio: 2026-09-27T23:18:51.932595+00:00  Fine: 2026-09-27T23:19:38.898271+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36358258541
+- Cosa è cambiato: trd-20260927T2315Z-SKYUSD-buy (placed), trd-20260927T2315Z-POLUSD-buy (placed)
+- Esito: compra SKY/USD: inviato; compra POL/USD: inviato
+- Rischio residuo: investito 6966.60$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Controllare l'esito dell'ingresso su SKY e POL in questo slot e verificare se ETH o LINK sono scesi sotto la soglia di uscita -0.3, oltre a monitorare se GRT/ONDO/RENDER in watch-list generano nuovi segnali pieni sopra 0.80.
+- Attenzione: saltati 11 slot dall'ultimo risveglio (20260927T2015Z): nessun recupero
+- Attenzione: ordine trd-20260927T2015Z-ONDOUSD-buy (buy ONDO/USD, aperto da 171 min): annullato
+<!-- entry -->
 ## 2026-09-27T20:15:00+00:00 · ok
 
 - Avvio: 2026-09-27T20:27:02.945922+00:00  Fine: 2026-09-27T20:27:47.208040+00:00
