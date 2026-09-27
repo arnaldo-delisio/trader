@@ -19,7 +19,7 @@
       "entry_t": 1790497036,
       "explore": true,
       "highest": 0.2323,
-      "stop": 0.2160370486143393,
+      "stop": 0.21603704866848578,
       "take_profit": 0.2590857672527433
     },
     "AVAX/USD": {
@@ -63,7 +63,7 @@
       "entry_t": 1790466519,
       "explore": true,
       "highest": 1.274575,
-      "stop": 1.208048019523995,
+      "stop": 1.2080480196147272,
       "take_profit": 1.3781207979963817
     },
     "ETH/USD": {
@@ -110,17 +110,6 @@
       "stop": 13.836599837908402,
       "take_profit": 15.175744285783015
     },
-    "ONDO/USD": {
-      "atr_at_entry": 0.008433102648606618,
-      "client_order_id": "trd-20260927T1615Z-ONDOUSD-buy",
-      "entry_at": "2026-09-27 16:17 UTC",
-      "entry_price": 0.545928,
-      "entry_t": 1790525846,
-      "explore": true,
-      "highest": 0.545928,
-      "stop": 0.5121955894055735,
-      "take_profit": 0.5965266158916397
-    },
     "POL/USD": {
       "atr_at_entry": 0.0014034988735031986,
       "client_order_id": "trd-20260927T1630Z-POLUSD-buy",
@@ -151,7 +140,7 @@
       "entry_t": 1790469112,
       "explore": true,
       "highest": 0.276395,
-      "stop": 0.2625786406293924,
+      "stop": 0.26257864070030057,
       "take_profit": 0.2905411298734655
     },
     "UNI/USD": {
@@ -166,15 +155,15 @@
       "take_profit": 10.703818506906753
     },
     "WIF/USD": {
-      "atr_at_entry": 0.004032691697067167,
-      "client_order_id": "trd-20260927T1600Z-WIFUSD-buy",
-      "entry_at": "2026-09-27 16:02 UTC",
-      "entry_price": 0.247313,
-      "entry_t": 1790524960,
+      "atr_at_entry": 0.004032691699122374,
+      "client_order_id": "trd-20260927T1645Z-WIFUSD-buy",
+      "entry_at": "2026-09-27 16:47 UTC",
+      "entry_price": 0.246,
+      "entry_t": 1790527666,
       "explore": true,
-      "highest": 0.247313,
-      "stop": 0.23118223321173134,
-      "take_profit": 0.271509150182403
+      "highest": 0.246,
+      "stop": 0.2298692332035105,
+      "take_profit": 0.27019615019473425
     },
     "YFI/USD": {
       "atr_at_entry": 23.301892992260072,
@@ -188,5 +177,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T16:32:43.280197+00:00"
+  "updated_at": "2026-09-27T16:47:46.999719+00:00"
 }
