@@ -51,7 +51,7 @@ Ogni segnale diventa un numero tra -1 e +1. Il punteggio è la media pesata con 
    Sulle crypto con spread largo o poco volatili questo esclude quasi ogni entrata: è voluto.
 3. **Dimensione.** Si rischia lo 0,5% del patrimonio se scatta lo stop iniziale, senza superare l'8%
    del patrimonio per crypto; poi Jev scala l'importo (x1,0 risk-on, x0,7 neutro, x0,4 risk-off).
-   I tetti nel codice (60% investito, 8% per crypto, 3% per memecoin, 10 posizioni) valgono sempre.
+   I tetti nel codice (60% investito, 8% per crypto, 3% per memecoin, 25 posizioni) valgono sempre.
 4. **Stop.** Stop mobile a 4 ATR orari sotto la chiusura più alta dall'entrata. Sale e non scende mai.
 5. **Take-profit.** Prezzo di entrata più 6 ATR orari (misurati all'entrata). Fisso.
 6. **Altre uscite.** Punteggio sceso a -0,3 o meno (`exit_threshold`), oppure 7 giorni di tenuta
@@ -81,16 +81,19 @@ riflessione che non ha niente da leggere. Per questo c'è un secondo canale, pic
 - **Chi.** Una crypto della lista corta che non passa la regola d'ingresso, con tendenza positiva
   sul 4h e un take-profit (6 ATR orari) almeno 3 volte il costo di un giro. Il filtro di mercato e la
   soglia del punteggio non valgono.
-- **Quanto.** L'1% del patrimonio, scalato dal regime di Jev, e al massimo il 5% del patrimonio in
+- **Quanto.** L'1,5% del patrimonio, scalato dal regime di Jev, e al massimo il 15% del patrimonio in
   tutte le posizioni di esplorazione insieme. Sono tetti nel codice (`HARD_CEILINGS`): il file dei
   limiti può solo abbassarli, la riflessione non può toccarli.
 - **Come esce.** Come tutte le altre: stop mobile, take-profit, tenuta massima, segnale.
 - **Dove si vede.** L'etichetta `esplorazione` nel journal, nei livelli d'uscita, su Telegram e nel
   cruscotto. La riflessione riassume a parte le operazioni della regola e quelle di esplorazione.
 
-Il rischio in soldi è piccolo: lo stop iniziale è a 4 ATR orari; con un ATR orario tra lo 0,5% e
-l'1,5% (un esempio, non una misura) è tra il 2% e il 6% sotto l'entrata, quindi con tutte e cinque le
-posizioni ferme allo stop si perde tra lo 0,1% e lo 0,3% del patrimonio. Quello che si compra è informazione: se le
+Il rischio in soldi resta piccolo: lo stop iniziale è a 4 ATR orari; con un ATR orario tra lo 0,5% e
+l'1,5% (un esempio, non una misura) è tra il 2% e il 6% sotto l'entrata, quindi con il 15% del patrimonio
+in esplorazione e tutte le posizioni ferme allo stop si perde tra lo 0,3% e lo 0,9% del patrimonio.
+I tetti erano all'1% e al 5% fino al 27 settembre 2026; li ho alzati perché la prima notte dal vivo
+il sistema è rimasto quasi fermo: lo voglio più attivo, dentro gli stessi tetti di rischio (60%
+investito, 8% per crypto, 3% per memecoin). Quello che si compra è informazione: se le
 esplorazioni sotto la soglia vanno bene più volte, la riflessione ha un motivo concreto per
 proporre di abbassarla, e il backtest decide se accettarlo.
 
