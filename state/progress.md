@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T15:00:00+00:00 · ok
+
+- Avvio: 2026-09-27T15:02:33.080034+00:00  Fine: 2026-09-27T15:03:46.415167+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36328075559
+- Cosa è cambiato: trd-20260927T1500Z-GRTUSD-buy (placed), trd-20260927T1500Z-POLUSD-buy (placed)
+- Esito: compra GRT/USD: inviato; compra POL/USD: inviato
+- Rischio residuo: investito 6378.83$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Controllare l'esito delle nuove posizioni GRT e POL e verificare se ARB si avvicina ulteriormente al suo stop (0.215528) o se il punteggio scende sotto -0.3.
+<!-- entry -->
 ## 2026-09-27T14:45:00+00:00 · no_trade
 
 - Avvio: 2026-09-27T14:47:37.050739+00:00  Fine: 2026-09-27T14:47:40.780309+00:00
