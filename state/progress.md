@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T07:15:00+00:00 · no_trade
+
+- Avvio: 2026-09-27T07:17:39.216485+00:00  Fine: 2026-09-27T07:18:27.125923+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36302642972
+- Cosa è cambiato: niente
+- Esito: nessun ordine: tutto hold o respinto dal gate
+- Rischio residuo: investito 3683.68$ (prima degli ordini di questo slot) su AAVEUSD, BATUSD, DOTUSD, FILUSD, LINKUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Verificare l'esito della nuova esplorazione AVAX (ADX debole) e controllare se RENDER (score 0.79, ADX 26) supera la soglia 0.80 diventando buy candidate pieno; monitorare AAVE e YFI (score 0.58 e 0.55, i più bassi) per eventuale avvicinamento alla soglia di uscita -0.3 e verificare se qualche posizione si avvicina a stop o take-profit.
+<!-- entry -->
 ## 2026-09-27T07:00:00+00:00 · no_trade
 
 - Avvio: 2026-09-27T07:05:27.993649+00:00  Fine: 2026-09-27T07:05:59.610057+00:00
