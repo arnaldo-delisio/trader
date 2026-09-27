@@ -11,6 +11,17 @@
       "stop": 149.85141381444953,
       "take_profit": 165.75183037279103
     },
+    "AVAX/USD": {
+      "atr_at_entry": 0.1613166844957121,
+      "client_order_id": "trd-20260927T0745Z-AVAXUSD-buy",
+      "entry_at": "2026-09-27 07:47 UTC",
+      "entry_price": 11.185,
+      "entry_t": 1790495258,
+      "explore": true,
+      "highest": 11.185,
+      "stop": 10.539733262017153,
+      "take_profit": 12.152900106974274
+    },
     "BAT/USD": {
       "atr_at_entry": 0.0017701442778930616,
       "client_order_id": "trd-20260926T2315Z-BATUSD-buy",
@@ -29,8 +40,8 @@
       "entry_price": 1.24308,
       "entry_t": 1790466519,
       "explore": true,
-      "highest": 1.26695,
-      "stop": 1.1933480915451513,
+      "highest": 1.274075,
+      "stop": 1.1950689420299099,
       "take_profit": 1.3781207979963817
     },
     "FIL/USD": {
@@ -40,8 +51,8 @@
       "entry_price": 1.138,
       "entry_t": 1790466519,
       "explore": true,
-      "highest": 1.14689,
-      "stop": 1.0582797553883838,
+      "highest": 1.150405,
+      "stop": 1.0617947552593603,
       "take_profit": 1.2990018659088813
     },
     "LINK/USD": {
@@ -51,8 +62,8 @@
       "entry_price": 14.1548,
       "entry_t": 1790467225,
       "explore": true,
-      "highest": 14.33265,
-      "stop": 13.691004544246923,
+      "highest": 14.375,
+      "stop": 13.733354543534855,
       "take_profit": 15.175744285783015
     },
     "POL/USD": {
@@ -84,8 +95,8 @@
       "entry_price": 0.2672,
       "entry_t": 1790469112,
       "explore": true,
-      "highest": 0.274285,
-      "stop": 0.25937963421759985,
+      "highest": 0.2747505,
+      "stop": 0.259845134216334,
       "take_profit": 0.2905411298734655
     },
     "UNI/USD": {
@@ -106,10 +117,10 @@
       "entry_price": 2482.45,
       "entry_t": 1790485365,
       "explore": true,
-      "highest": 2505.3385,
-      "stop": 2416.066011766893,
+      "highest": 2516.828,
+      "stop": 2427.5555117937283,
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T07:32:37.164159+00:00"
+  "updated_at": "2026-09-27T07:47:38.422008+00:00"
 }
