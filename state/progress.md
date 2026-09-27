@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T20:15:00+00:00 · ok
+
+- Avvio: 2026-09-27T20:27:02.945922+00:00  Fine: 2026-09-27T20:27:47.208040+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36348056778
+- Cosa è cambiato: trd-20260927T2015Z-GRTUSD-sell (placed), trd-20260927T2015Z-ONDOUSD-buy (placed)
+- Esito: vendi GRT/USD: inviato; compra ONDO/USD: inviato
+- Rischio residuo: investito 7823.59$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, GRTUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Verificare se GRT/USD è stato chiuso automaticamente al take-profit (prezzo già sopra 0.0306967) e controllare l'esito della nuova posizione esplorativa su ONDO aperta in questo slot, oltre a monitorare ETH e LINK i cui score (+0.08 e +0.07) sono i più vicini alla soglia di uscita -0.3.
+- Attenzione: saltati 10 slot dall'ultimo risveglio (20260927T1730Z): nessun recupero
+- Attenzione: ordine trd-20260927T1730Z-POLUSD-buy (buy POL/USD, aperto da 162 min): annullato
+<!-- entry -->
 ## 2026-09-27T17:30:00+00:00 · ok
 
 - Avvio: 2026-09-27T17:44:30.233656+00:00  Fine: 2026-09-27T17:45:10.584140+00:00

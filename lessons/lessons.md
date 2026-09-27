@@ -3,6 +3,14 @@
 Scritte dalla riflessione ogni 6 ore, la più recente in alto. Il modello le rilegge a ogni risveglio.
 
 <!-- lesson -->
+## 2026-09-27 20:27 UTC · slot 20260927T2015Z
+
+- Con un solo trade chiuso (n=1, +89.33$ su GRTUSD, esplorazione, TP centrato) il campione è troppo piccolo per qualsiasi attribuzione statistica: non modifico pesi, soglie, stop o take-profit in questa riflessione.
+- L'unico trade chiuso proviene dalla categoria esplorazione (regola: 0 trade, esplorazione: 1 trade, 100% win) e ha raggiunto il take-profit con un guadagno netto del 12.99%: è un indizio che entry_threshold=0.80 potrebbe essere troppo rigido, ma un solo esito non basta a distinguere segnale da fortuna.
+- Tutti i segnali (adx, bollinger, macd, momentum, rsi, trend_1h, trend_4h, volume) risultano positivi sull'unico trade vincente, quindi non c'è ancora varianza sufficiente per alzare o abbassare pesi specifici: servono trade con segnali contrastanti per un'attribuzione affidabile.
+- Il fatto che il take-profit sia stato raggiunto in sole 5.4 ore suggerisce che tp_atr_mult=6.0 non è troppo lontano per questo tipo di mossa, ma con un solo caso non è prudente dedurre che vada alzato o abbassato: servono almeno ~10 trade chiusi per verificare se i target vengono raggiunti troppo spesso o quasi mai.
+- Mantenere tutti i parametri invariati finché non si accumula un campione minimo di operazioni chiuse (regola e esplorazione insieme) sufficiente a separare rumore da segnale reale, come già indicato nelle riflessioni precedenti.
+<!-- lesson -->
 ## 2026-09-27 13:03 UTC · slot 20260927T1300Z
 
 - Con 0 trade chiusi (solo posizioni esplorative ancora aperte su BAT, POL, FIL, DOT, LINK, SUSHI, UNI, RENDER, YFI) manca qualsiasi base statistica: non modifico pesi, soglie, stop/TP o size in questa riflessione.

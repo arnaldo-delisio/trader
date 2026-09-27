@@ -8,7 +8,7 @@
       "entry_t": 1790487165,
       "explore": true,
       "highest": 157.3115,
-      "stop": 150.6172469074415,
+      "stop": 150.75012199453766,
       "take_profit": 165.75183037279103
     },
     "ARB/USD": {
@@ -18,8 +18,8 @@
       "entry_price": 0.2323,
       "entry_t": 1790497036,
       "explore": true,
-      "highest": 0.2323,
-      "stop": 0.2164256880493082,
+      "highest": 0.232885,
+      "stop": 0.21713022972823434,
       "take_profit": 0.2590857672527433
     },
     "AVAX/USD": {
@@ -30,7 +30,7 @@
       "entry_t": 1790495258,
       "explore": true,
       "highest": 11.23805,
-      "stop": 10.597280520554692,
+      "stop": 10.638154318444316,
       "take_profit": 12.152900106974274
     },
     "BAT/USD": {
@@ -41,7 +41,7 @@
       "entry_t": 1790464582,
       "explore": true,
       "highest": 0.0978995,
-      "stop": 0.09221803353485744,
+      "stop": 0.09252168725982497,
       "take_profit": 0.10647106566735837
     },
     "BONK/USD": {
@@ -51,8 +51,8 @@
       "entry_price": 3.73e-06,
       "entry_t": 1790525846,
       "explore": true,
-      "highest": 3.73e-06,
-      "stop": 3.4888004766414144e-06,
+      "highest": 3.745e-06,
+      "stop": 3.515960026936586e-06,
       "take_profit": 4.091799285037878e-06
     },
     "DOT/USD": {
@@ -73,8 +73,8 @@
       "entry_price": 2694.56,
       "entry_t": 1790519561,
       "explore": true,
-      "highest": 2694.56,
-      "stop": 2656.05567506374,
+      "highest": 2697.55,
+      "stop": 2657.560475505692,
       "take_profit": 2752.3164878101975
     },
     "FIL/USD": {
@@ -85,7 +85,7 @@
       "entry_t": 1790466519,
       "explore": true,
       "highest": 1.1566,
-      "stop": 1.085005695278318,
+      "stop": 1.0880781699174507,
       "take_profit": 1.2990018659088813
     },
     "GRT/USD": {
@@ -95,8 +95,8 @@
       "entry_price": 0.028413,
       "entry_t": 1790521353,
       "explore": true,
-      "highest": 0.028935,
-      "stop": 0.027308286746429346,
+      "highest": 0.03321865,
+      "stop": 0.030375040880323338,
       "take_profit": 0.030696663885367306
     },
     "LINK/USD": {
@@ -107,8 +107,19 @@
       "entry_t": 1790467225,
       "explore": true,
       "highest": 14.443,
-      "stop": 13.841920903987516,
+      "stop": 13.892950664100464,
       "take_profit": 15.175744285783015
+    },
+    "ONDO/USD": {
+      "atr_at_entry": 0.008146686072782454,
+      "client_order_id": "trd-20260927T2015Z-ONDOUSD-buy",
+      "entry_at": "2026-09-27 20:27 UTC",
+      "entry_price": 0.5554,
+      "entry_t": 1790540822,
+      "explore": true,
+      "highest": 0.5554,
+      "stop": 0.5228132557088702,
+      "take_profit": 0.6042801164366948
     },
     "POL/USD": {
       "atr_at_entry": 0.0013573560874487955,
@@ -128,8 +139,8 @@
       "entry_price": 123.01,
       "entry_t": 1790514120,
       "explore": true,
-      "highest": 123.15,
-      "stop": 119.01148490595641,
+      "highest": 123.3555,
+      "stop": 119.42760725103598,
       "take_profit": 129.16240055691708
     },
     "SUSHI/USD": {
@@ -140,7 +151,7 @@
       "entry_t": 1790469112,
       "explore": true,
       "highest": 0.276395,
-      "stop": 0.2628840949359934,
+      "stop": 0.2639142644040424,
       "take_profit": 0.2905411298734655
     },
     "UNI/USD": {
@@ -151,7 +162,7 @@
       "entry_t": 1790473584,
       "explore": true,
       "highest": 10.13055,
-      "stop": 9.570583171458745,
+      "stop": 9.591210036160573,
       "take_profit": 10.703818506906753
     },
     "YFI/USD": {
@@ -166,5 +177,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T17:44:30.233787+00:00"
+  "updated_at": "2026-09-27T20:27:02.946027+00:00"
 }
