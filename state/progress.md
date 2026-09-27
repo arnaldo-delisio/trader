@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-27T16:00:00+00:00 · ok
+
+- Avvio: 2026-09-27T16:02:40.442625+00:00  Fine: 2026-09-27T16:03:40.606770+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36331743630
+- Cosa è cambiato: trd-20260927T1600Z-WIFUSD-buy (placed)
+- Esito: compra WIF/USD: inviato
+- Rischio residuo: investito 7065.86$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, DOTUSD, ETHUSD, FILUSD, GRTUSD, LINKUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Controllare se UNI (a circa 0.36% dallo stop 9.57058) ha toccato lo stop o se il suo score è sceso sotto -0.3, e verificare l'esito della nuova posizione esplorativa su WIF aperta in questo slot.
+<!-- entry -->
 ## 2026-09-27T15:45:00+00:00 · ok
 
 - Avvio: 2026-09-27T15:47:43.090853+00:00  Fine: 2026-09-27T15:48:30.936349+00:00
