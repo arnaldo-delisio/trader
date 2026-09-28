@@ -3,6 +3,16 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T08:45:00+00:00 · already_done
+
+- Avvio: 2026-09-28T08:48:06.378707+00:00  Fine: 2026-09-28T08:48:07.355275+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36399472113
+- Cosa è cambiato: niente
+- Esito: slot già eseguito (9 ordini con questo slot): nessun nuovo ordine
+- Rischio residuo: investito 577.47$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti
+- Prossimo compito: riprovare la vendita di BONK/USD
+- Attenzione: slot già visto nell'ultimo handoff: esecuzione ripetuta o sovrapposta
+<!-- entry -->
 ## 2026-09-28T08:45:00+00:00 · liquidating
 
 - Avvio: 2026-09-28T08:47:14.761378+00:00  Fine: 2026-09-28T08:47:48.816589+00:00
