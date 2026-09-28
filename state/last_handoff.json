@@ -1,25 +1,66 @@
 {
-  "slot": "2026-09-28T08:45:00+00:00",
-  "slot_id": "20260928T0845Z",
-  "started_at": "2026-09-28T08:48:06.378707+00:00",
-  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36399472113",
+  "slot": "2026-09-28T09:45:00+00:00",
+  "slot_id": "20260928T0945Z",
+  "started_at": "2026-09-28T09:47:31.941802+00:00",
+  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36405709375",
   "dry_run": false,
-  "status": "already_done",
-  "decisions": [],
-  "warnings": [
-    "slot già visto nell'ultimo handoff: esecuzione ripetuta o sovrapposta"
+  "status": "liquidating",
+  "decisions": [
+    {
+      "symbol": "BONK/USD",
+      "action": "sell",
+      "requested_usd": 535.1,
+      "approved": true,
+      "reason": "ammesso",
+      "order": {
+        "symbol": "BONK/USD",
+        "side": "sell",
+        "qty": 156921866.80650237
+      },
+      "explore": false,
+      "reason_model": "liquidazione: vendita di tutta la posizione",
+      "auto": true,
+      "exit": "liquidazione",
+      "outcome": "rejected",
+      "client_order_id": "trd-20260928T0945Z-BONKUSD-sell",
+      "detail": "rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
+    }
   ],
-  "alerts": [],
-  "changed": "",
-  "outcome": "slot già eseguito (9 ordini con questo slot): nessun nuovo ordine",
+  "warnings": [
+    "saltati 3 slot dall'ultimo risveglio (20260928T0845Z): nessun recupero",
+    "trd-20260928T0945Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
+  ],
+  "alerts": [
+    "trd-20260928T0945Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
+  ],
+  "changed": "trd-20260928T0945Z-BONKUSD-sell (rejected)",
+  "outcome": "liquidazione: niente da vendere; restano BONK/USD, il prossimo risveglio riprova",
   "remaining_risk": "investito 577.47$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti",
   "next_job": "riprovare la vendita di BONK/USD",
   "equity": 99540.35,
   "error": "",
   "positions": [],
+  "missed_slots": 3,
   "day_change_pct": -0.45964999999998923,
-  "finished_at": "2026-09-28T08:48:07.355275+00:00",
-  "commit_message": "Record wake 20260928T0845Z already_done",
+  "liquidation": {
+    "sold": [],
+    "left": [
+      "BONK/USD"
+    ],
+    "flat": false,
+    "equity": 99540.35,
+    "cash": 98962.88,
+    "baseline_equity": 99999.87,
+    "reported": false,
+    "pnl_usd": -459.5199999999895,
+    "pnl_pct": -0.4595205973767613,
+    "trades": 14,
+    "win_rate_pct": 7.1,
+    "trades_pnl_usd": -448.55,
+    "fees_usd": 59.25
+  },
+  "finished_at": "2026-09-28T09:48:03.995950+00:00",
+  "commit_message": "Record wake 20260928T0945Z liquidating",
   "notified": true,
-  "notify_detail": "risveglio tranquillo: nessun messaggio"
+  "notify_detail": "inviato"
 }
