@@ -54,8 +54,12 @@ class Outbox:
 
 
 # The shipped parameters, with a lower entry bar so the invented price paths of FakeAlpaca
-# give buy candidates (BTC, SOL, DOGE, ETH score about 0.66 to 0.69 on them).
-TEST_PARAMS = {"entry_threshold": 0.6, "min_edge_mult": 10.0}
+# give buy candidates (BTC, SOL, DOGE, ETH score about 0.66 to 0.69 on them). The weights are
+# pinned: the reflection rewrites config/params.json (weights.volume 0.25 -> 0.5 on
+# 2026-09-28), and the tests must not change with what the agent learned.
+TEST_PARAMS = {"entry_threshold": 0.6, "min_edge_mult": 10.0,
+               "weights": {"adx": 0.5, "bollinger": 0.0, "macd": 0.5, "momentum": 1.0, "rsi": 0.5,
+                           "trend_1h": 1.0, "trend_4h": 1.0, "volume": 0.25}}
 
 
 @pytest.fixture(autouse=True)

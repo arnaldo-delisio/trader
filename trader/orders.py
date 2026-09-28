@@ -37,13 +37,15 @@ class Placement:
     order: dict | None = None  # the order exactly as Alpaca returned it
 
 
-def format_qty(qty: float) -> str:
+def format_qty(qty: float | str) -> str:
     """A sell quantity at Alpaca's precision (min_trade_increment 1e-9 on every crypto pair,
-    checked 2026-09-27), rounded down. Rounding to nearest could ask for 1e-9 more than is
-    held: a memecoin holding of millions of units has about 16 significant digits, beyond
-    what a float keeps, and the sell of the whole position would be rejected. Rounding the
-    float's exact value down leaves at most 1e-9 of the coin behind."""
-    d = Decimal(float(qty)).quantize(Decimal("1e-9"), rounding=ROUND_DOWN)  # the exact binary value
+    checked 2026-09-27), rounded down. A float cannot carry a memecoin holding exactly: even
+    rounded down, its binary value can exceed what is held (BONK 156921866.806502359 became
+    ...372 and Alpaca refused the sell with 'insufficient balance', 2026-09-28). So a
+    whole-position sell passes Alpaca's own qty_available string, used digit for digit;
+    a float is only for partial sells, which stay well under the holding."""
+    exact = Decimal(qty) if isinstance(qty, str) else Decimal(float(qty))  # a float: its exact binary value
+    d = exact.quantize(Decimal("1e-9"), rounding=ROUND_DOWN)
     return format(d.normalize(), "f") if d else "0"
 
 

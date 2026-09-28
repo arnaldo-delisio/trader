@@ -206,3 +206,37 @@ def test_a_sell_quantity_is_never_more_than_what_alpaca_says_is_held(held):
     out = format_qty(float(held))
     assert Decimal(out) <= Decimal(held) and Decimal(held) - Decimal(out) <= Decimal("1e-9")
     assert "e" not in out.lower() and len(out.split(".")[-1]) <= 9 if "." in out else True
+
+
+def test_a_whole_position_sell_sends_exactly_what_alpaca_says_is_available():
+    # 2026-09-28: Alpaca refused the BONK liquidation (HTTP 403 'insufficient balance'). The
+    # float of 156921866.806502359, even rounded down, was 156921866.806502372.
+    from decimal import Decimal
+
+    from tests.test_risk import LIMITS
+    from trader.context import snapshot
+    from trader.model import Decision
+    from trader.risk import gate
+
+    held = "156921866.806502359"
+    position = {"symbol": "BONKUSD", "asset_class": "crypto", "qty": held, "qty_available": held,
+                "market_value": "3100.12"}
+    quote = {"BONK/USD": {"bp": "0.00001975", "ap": "0.00001976"}}
+    snap = snapshot({"equity": "100000", "last_equity": "100000", "cash": "90000"}, [position], [], quote)
+    v = gate([Decision("BONK/USD", "sell", 3099.2, "liquidazione")], snap, LIMITS, enabled=True,
+             buys_enabled=False)[0]
+    assert v.approved, v.reason
+
+    sent = []
+
+    def alpaca(method, url, headers, body):
+        if method == "GET":
+            return 404, json.dumps({"message": "order not found"})
+        sent.append(json.loads(body))
+        if Decimal(sent[-1]["qty"]) > Decimal(held):
+            return 403, json.dumps({"code": 40310000, "message": "insufficient balance"})
+        return 200, json.dumps({"id": "o1", "client_order_id": sent[-1]["client_order_id"], "status": "new"})
+
+    p = place(client(alpaca), SLOT, v.order, [])
+    assert p.outcome == "placed", p.detail
+    assert sent[-1]["qty"] == held

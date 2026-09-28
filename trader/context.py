@@ -33,12 +33,17 @@ def snapshot(account: dict, positions: list[dict], open_orders: list[dict], quot
         trading_blocked=bool(account.get("trading_blocked")) or account.get("crypto_status", "ACTIVE") != "ACTIVE",
         bids={s: f(q.get("bp")) for s, q in quotes.items()},
         asks={s: f(q.get("ap")) for s, q in quotes.items()},
-        holdings={norm_symbol(p["symbol"]): Holding(f(p.get("qty_available", p.get("qty"))), f(p.get("market_value")))
+        holdings={norm_symbol(p["symbol"]): Holding(f(_qty_text(p)), f(p.get("market_value")), _qty_text(p))
                   for p in positions if p.get("asset_class", "crypto") == "crypto"},
         open_order_symbols=frozenset(norm_symbol(o["symbol"]) for o in open_orders),
         pending_buys=_pending_buys(open_orders),
         min_qty={a["symbol"]: f(a.get("min_order_size")) for a in assets or [] if a.get("symbol")},
     )
+
+
+def _qty_text(p: dict) -> str:
+    q = p.get("qty_available", p.get("qty"))
+    return str(q) if q is not None else ""
 
 
 def _pending_buys(open_orders: list[dict]) -> dict[str, float]:

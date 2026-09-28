@@ -18,6 +18,7 @@ from .model import Decision
 class Holding:
     qty_available: float
     market_value: float
+    qty_text: str = ""  # qty_available exactly as Alpaca wrote it: a whole-position sell sends this
 
 
 @dataclass(frozen=True)
@@ -201,7 +202,9 @@ def gate(decisions: list[Decision], s: Snapshot, limits: Limits, enabled: bool =
             no(f"{qty * bid:.2f}$ sotto il minimo per {'la vendita di tutto' if whole else 'ordine'} di {floor:.2f}$")
             continue
         v.approved, v.reason = True, "ammesso"
-        v.order = {"symbol": d.symbol, "side": "sell", "qty": qty}
+        # A whole-position sell sends Alpaca's own string: a float of a memecoin holding
+        # (156921866.806502359 BONK, 2026-09-28) can be larger than what is held.
+        v.order = {"symbol": d.symbol, "side": "sell", "qty": h.qty_text if whole and h.qty_text else qty}
         held_value[key] = max(0.0, held_value.get(key, 0.0) - qty * bid)
         exposure = max(0.0, exposure - qty * bid)
         placed += 1
