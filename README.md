@@ -1,7 +1,7 @@
 # trader
 
 Un agente che fa trading di crypto su un conto **Alpaca paper** (soldi finti), da solo.
-GitHub Actions lo sveglia ogni 15 minuti. A ogni risveglio non ricorda niente: ricostruisce
+GitHub Actions chiede un risveglio ogni 15 minuti. A ogni risveglio non ricorda niente: ricostruisce
 la situazione da Alpaca e dai record nel repo, calcola indicatori e punteggi per 31 crypto,
 fa rispettare stop e take-profit, chiede una proposta a un modello solo quando c'è qualcosa
 da comprare, la fa passare da un controllo del rischio scritto in codice, invia gli ordini
@@ -73,8 +73,8 @@ esegue `ruff check .` su tutto il repo, `ui/` compreso, con la versione fissata 
 3. **Contesto.** Da Alpaca: conto, posizioni, ordini aperti, ordini e fill recenti, le crypto
    negoziabili, i prezzi e 10 giorni di barre da 15 minuti per ogni crypto. Dal repo: l'ultimo
    handoff, i livelli d'uscita delle posizioni, i parametri, le ultime lezioni.
-4. **Riconciliazione.** Ordini `trd-` che Alpaca conosce e le evidence no vengono da un run
-   interrotto: si registrano e si segnalano. Se lo slot ha già ordini, o è già completato, il run
+4. **Riconciliazione.** Un ordine `trd-` che Alpaca conosce ma che manca nelle evidence viene da un
+   run interrotto: si registra e si segnala. Se lo slot ha già ordini, o è già completato, il run
    resta in sola lettura.
 5. **Universo e mercato.** Le 31 crypto ammesse (`config/limits.toml`, dentro la lista nel
    codice) incrociate con quelle che Alpaca dà come negoziabili adesso. Per ciascuna, sulle
@@ -253,6 +253,13 @@ che ogni 15 minuti lancia lo stesso workflow (`gh workflow run wake.yml --ref wo
 Due avvii nello stesso slot non fanno danni: il secondo trova lo slot già eseguito e resta in sola
 lettura, e l'id dell'ordine è lo stesso.
 
+I numeri finali della corsa, dal 27/09 alle 07:04 UTC al 28/09 alle 10:32 UTC su questo repo: 31 run,
+di cui solo 6 avviati dal `schedule` di GitHub. Nella notte tra il 27 e il 28 settembre, con il
+timer spento dalle 16:47 UTC, GitHub da solo ha avviato 5 risvegli in 16 ore. Per chi lo rifà: il
+secondo avvio va messo su un servizio sempre acceso, per esempio un job gratuito su
+[cron-job.org](https://cron-job.org) che chiama l'API `workflow_dispatch` ogni 15 minuti, e non
+su un portatile.
+
 Per controllare quali run sono partiti da soli:
 
 ```sh
@@ -361,13 +368,18 @@ chiuderle, usa prima `LIQUIDATE`.
   po' più piccole del previsto, mai più grandi.
 - Il backtest non simula l'esplorazione: la riflessione la valuta sulle operazioni vere.
 - Se si perdono sia `state/positions.json` sia il journal, una posizione di esplorazione perde
-  l'etichetta e smette di contare nel 5%; i tetti generali (8% per crypto, 60% investito) valgono comunque.
+  l'etichetta e smette di contare nel 15%; i tetti generali (8% per crypto, 60% investito) valgono comunque.
 - Il modello viene interpellato solo quando c'è un candidato; il backtest non sa se farà meglio
   o peggio della regola del punteggio (vedi [STRATEGY.md](STRATEGY.md)).
 - Con 15 minuti di cadenza e i ritardi di GitHub, uno stop può scattare fino a 30 minuti dopo
   che il prezzo l'ha toccato; in un crollo veloce l'uscita avviene più in basso. Se nessun
   risveglio parte, nessuno controlla gli stop (vedi [Chi lo sveglia](#chi-lo-sveglia)): non ci
   sono ordini stop in attesa su Alpaca.
+- Niente avvisa in tempo reale quando i risvegli non partono: un risveglio saltato diventa solo
+  un avviso nell'handoff del risveglio successivo. È così che la liquidazione prevista per le
+  21:00 UTC del 27 settembre 2026 è saltata senza che nessuno se ne accorgesse fino al mattino
+  dopo. Il passo successivo è un heartbeat esterno che manda un messaggio su Telegram se non
+  arriva nessun risveglio per 45 minuti.
 - Un ordine fermo viene annullato solo dal risveglio che parte almeno 20 minuti dopo: fino ad
   allora blocca gli altri ordini su quel simbolo.
 - La riscrittura dei record dopo un push respinto non può evitare che due risvegli dallo stesso
