@@ -3,6 +3,15 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T10:30:00+00:00 · liquidated
+
+- Avvio: 2026-09-28T10:32:22.310803+00:00  Fine: 2026-09-28T10:32:26.241772+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36410284251
+- Cosa è cambiato: trd-20260928T1030Z-BONKUSD-sell (placed)
+- Esito: liquidazione: vendute 1 posizioni; tutto in liquidità
+- Rischio residuo: investito 546.09$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti
+- Prossimo compito: niente: conto in liquidità
+<!-- entry -->
 ## 2026-09-28T10:15:00+00:00 · liquidating
 
 - Avvio: 2026-09-28T10:17:45.153206+00:00  Fine: 2026-09-28T10:18:25.224601+00:00

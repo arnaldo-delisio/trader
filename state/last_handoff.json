@@ -1,64 +1,60 @@
 {
-  "slot": "2026-09-28T10:15:00+00:00",
-  "slot_id": "20260928T1015Z",
-  "started_at": "2026-09-28T10:17:45.153206+00:00",
-  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36408828973",
+  "slot": "2026-09-28T10:30:00+00:00",
+  "slot_id": "20260928T1030Z",
+  "started_at": "2026-09-28T10:32:22.310803+00:00",
+  "run_url": "https://github.com/arnaldo-delisio/trader/actions/runs/36410284251",
   "dry_run": false,
-  "status": "liquidating",
+  "status": "liquidated",
   "decisions": [
     {
       "symbol": "BONK/USD",
       "action": "sell",
-      "requested_usd": 539.81,
+      "requested_usd": 542.95,
       "approved": true,
       "reason": "ammesso",
       "order": {
         "symbol": "BONK/USD",
         "side": "sell",
-        "qty": 156921866.80650237
+        "qty": "156921866.806502359"
       },
       "explore": false,
       "reason_model": "liquidazione: vendita di tutta la posizione",
       "auto": true,
       "exit": "liquidazione",
-      "outcome": "rejected",
-      "client_order_id": "trd-20260928T1015Z-BONKUSD-sell",
-      "detail": "rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
+      "outcome": "placed",
+      "client_order_id": "trd-20260928T1030Z-BONKUSD-sell",
+      "detail": "inviato"
     }
   ],
-  "warnings": [
-    "trd-20260928T1015Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
-  ],
-  "alerts": [
-    "trd-20260928T1015Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {\"available\":\"156921866.806502359\",\"balance\":\"156921866.806502359\",\"code\":40310000,\"message\":\"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)\",\"symbol\":\""
-  ],
-  "changed": "trd-20260928T1015Z-BONKUSD-sell (rejected)",
-  "outcome": "liquidazione: niente da vendere; restano BONK/USD, il prossimo risveglio riprova",
-  "remaining_risk": "investito 577.47$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti",
-  "next_job": "riprovare la vendita di BONK/USD",
-  "equity": 99540.35,
+  "warnings": [],
+  "alerts": [],
+  "changed": "trd-20260928T1030Z-BONKUSD-sell (placed)",
+  "outcome": "liquidazione: vendute 1 posizioni; tutto in liquidità",
+  "remaining_risk": "investito 546.09$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti",
+  "next_job": "niente: conto in liquidità",
+  "equity": 99504.0,
   "error": "",
   "positions": [],
-  "day_change_pct": -0.45964999999998923,
+  "day_change_pct": -0.4910300000000034,
   "liquidation": {
-    "sold": [],
-    "left": [
+    "sold": [
       "BONK/USD"
     ],
-    "flat": false,
-    "equity": 99540.35,
-    "cash": 98962.88,
+    "left": [],
+    "flat": true,
+    "equity": 99504.0,
+    "cash": 99504.0,
     "baseline_equity": 99999.87,
     "reported": false,
-    "pnl_usd": -459.5199999999895,
-    "pnl_pct": -0.4595205973767613,
-    "trades": 14,
-    "win_rate_pct": 7.1,
-    "trades_pnl_usd": -448.55,
-    "fees_usd": 59.25
+    "pnl_usd": -495.86999999999534,
+    "pnl_pct": -0.49587064463183506,
+    "trades": 15,
+    "win_rate_pct": 6.7,
+    "trades_pnl_usd": -495.78,
+    "fees_usd": 62.08
   },
-  "finished_at": "2026-09-28T10:18:25.224601+00:00",
-  "commit_message": "Record wake 20260928T1015Z liquidating",
+  "finished_at": "2026-09-28T10:32:26.241772+00:00",
+  "commit_message": "Record wake 20260928T1030Z liquidated",
   "notified": true,
   "notify_detail": "inviato"
 }
