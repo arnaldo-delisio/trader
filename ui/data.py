@@ -207,8 +207,13 @@ def positions(r: Reader, handoff: dict) -> list[dict]:
     if isinstance(raw, dict):
         rows = [{"symbol": k, **v} for k, v in raw.items() if isinstance(v, dict)]
     by_sym = {symbol(x.get("symbol")): x for x in rows if x.get("symbol")}
-    for s in levels:  # levels without a position row still show, with what we know
-        by_sym.setdefault(s, {"symbol": s})
+    # Levels without a position row still show, with what we know, but only when the
+    # handoff carries no position list. When it does, that list is Alpaca's view and a
+    # level left for a coin no longer held is stale: after the 2026-09-28 liquidation
+    # the page showed 15 open positions, all n/d, on a flat account.
+    if raw is None:
+        for s in levels:
+            by_sym.setdefault(s, {"symbol": s})
     out = []
     for s, p in by_sym.items():
         lv = levels.get(s, {})

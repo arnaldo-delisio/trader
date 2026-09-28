@@ -212,6 +212,16 @@ def test_invested_comes_from_the_handoffs_position_values(tmp_path):
     assert [p["market_value"] for p in m["positions"]] == [600.0, 400.0]
 
 
+def test_levels_of_coins_no_longer_held_are_not_shown_as_positions(tmp_path):
+    root = tmp_path / "repo"
+    (root / "state").mkdir(parents=True)
+    (root / "state/positions.json").write_text(json.dumps({"positions": {"SOL/USD": {
+        "entry_price": 150.0, "stop": 146.0, "take_profit": 156.0}}}))
+    (root / "state/last_handoff.json").write_text(json.dumps({
+        "slot": "2026-09-26T11:45:00+00:00", "status": "liquidated", "equity": 10000.0, "positions": []}))
+    assert data.load(root, NOW)["positions"] == []
+
+
 def test_the_page_shows_buys_paused_from_the_handoff_status(tmp_path):
     root = tmp_path / "repo"
     (root / "state").mkdir(parents=True)
