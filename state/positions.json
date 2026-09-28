@@ -128,7 +128,7 @@
       "entry_price": 0.08131,
       "entry_t": 1790551131,
       "explore": false,
-      "highest": 0.0848747,
+      "highest": 0.08576275,
       "stop": 0.07847536510203185,
       "take_profit": 0.0899072688868491
     },
@@ -154,17 +154,6 @@
       "stop": 0.2639142644040424,
       "take_profit": 0.2905411298734655
     },
-    "UNI/USD": {
-      "atr_at_entry": 0.14296975115112534,
-      "client_order_id": "trd-20260927T0145Z-UNIUSD-buy",
-      "entry_at": "2026-09-27 01:46 UTC",
-      "entry_price": 9.846,
-      "entry_t": 1790473584,
-      "explore": true,
-      "highest": 10.13055,
-      "stop": 9.602975337723157,
-      "take_profit": 10.703818506906753
-    },
     "YFI/USD": {
       "atr_at_entry": 23.301892992260072,
       "client_order_id": "trd-20260927T0500Z-YFIUSD-buy",
@@ -177,5 +166,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-28T01:51:42.048162+00:00"
+  "updated_at": "2026-09-28T08:15:28.018777+00:00"
 }

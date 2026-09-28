@@ -3,6 +3,26 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T08:15:00+00:00 · ok
+
+- Avvio: 2026-09-28T08:15:28.018677+00:00  Fine: 2026-09-28T08:16:17.575085+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36396249737
+- Cosa è cambiato: trd-20260928T0815Z-AAVEUSD-sell (placed), trd-20260928T0815Z-ARBUSD-sell (placed), trd-20260928T0815Z-AVAXUSD-sell (placed)
+- Esito: vendi AAVE/USD: inviato; vendi ARB/USD: inviato; vendi AVAX/USD: inviato
+- Rischio residuo: investito 11235.44$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SKYUSD, SOLUSD, SUSHIUSD, YFIUSD; 1 ordini aperti
+- Prossimo compito: Controllare se SKY (score +0.73) supera la soglia piena 0.75 per un possibile ingresso a regola, e verificare se ARB, BONK, SUSHI, YFI ed ETH (tutti sotto -0.3) sono stati effettivamente chiusi dal sistema automatico per punteggio debole.
+- Attenzione: saltati 25 slot dall'ultimo risveglio (20260928T0145Z): nessun recupero
+- Attenzione: ordine trd-20260928T0145Z-POLUSD-buy (buy POL/USD, aperto da 383 min): annullato
+- Attenzione: ordine trd-20260928T0145Z-ONDOUSD-buy (buy ONDO/USD, aperto da 383 min): annullato
+- Attenzione: uscita stop su BAT/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su BONK/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su ETH/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su FIL/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su LINK/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su SOL/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su SUSHI/USD respinta: superato il massimo di 3 ordini per risveglio
+- Attenzione: uscita stop su YFI/USD respinta: superato il massimo di 3 ordini per risveglio
+<!-- entry -->
 ## 2026-09-28T01:45:00+00:00 · ok
 
 - Avvio: 2026-09-28T01:51:42.048050+00:00  Fine: 2026-09-28T01:52:24.468512+00:00

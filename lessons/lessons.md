@@ -3,6 +3,14 @@
 Scritte dalla riflessione ogni 6 ore, la più recente in alto. Il modello le rilegge a ogni risveglio.
 
 <!-- lesson -->
+## 2026-09-28 08:16 UTC · slot 20260928T0815Z
+
+- Con 5 trade chiusi (tutti esplorazione, 0 dalla regola) siamo ancora sotto la soglia minima di ~10 indicata dalle linee guida: mantengo un solo cambiamento cauto e nessuna modifica a stop/tp o soglie di ingresso/uscita in questa riflessione.
+- Le 5 operazioni esplorative hanno perso in aggregato -78.62$ con win rate 20% (4 stop su 5), quindi i punteggi appena sotto soglia (0.79, 0.89, 0.64 citati nei log) che non hanno attivato la regola si sono rivelati esiti negativi: questo smentisce l'ipotesi delle riflessioni precedenti che entry_threshold=0.75 fosse troppo rigido, e anzi supporta il mantenerlo o alzarlo, non abbassarlo.
+- Il segnale volume mostra ora corr=0.966 con n=5 (positivo: +0.40% win 33.3%; non positivo: -6.70% win 0%), confermando lo stesso pattern già osservato con n=2 in una riflessione precedente: due letture consecutive coerenti giustificano un piccolo aumento del suo peso, attualmente il più basso (0.25).
+- ADX ha corr=0.922 ma anche quando positivo il pnl medio resta negativo (-0.44% su 4 trade), quindi il segnale distingue i disastri (worst -10.4% quando adx non positivo) ma non garantisce trade vincenti: non alzare ancora il suo peso, servono più dati.
+- I 4 trade chiusi a stop hanno impiegato 20-27h prima di scattare (non rapidamente), mentre l'unico take-profit è arrivato in 5.4h: non c'è evidenza che gli stop siano troppo stretti, quindi non tocco stop_atr_mult né tp_atr_mult con questo campione.
+<!-- lesson -->
 ## 2026-09-28 01:52 UTC · slot 20260928T0145Z
 
 - Con soli 2 trade chiusi (1 vinto a take-profit, 1 perso a stop) il campione resta troppo piccolo per un'attribuzione statistica affidabile sui pesi dei segnali: non tocco i pesi in questa riflessione.
