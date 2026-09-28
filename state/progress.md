@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T08:45:00+00:00 · liquidating
+
+- Avvio: 2026-09-28T08:47:14.761378+00:00  Fine: 2026-09-28T08:47:48.816589+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36399434133
+- Cosa è cambiato: trd-20260928T0845Z-BATUSD-sell (placed), trd-20260928T0845Z-BONKUSD-sell (rejected), trd-20260928T0845Z-DOTUSD-sell (placed), trd-20260928T0845Z-ETHUSD-sell (placed), trd-20260928T0845Z-FILUSD-sell (placed), trd-20260928T0845Z-LINKUSD-sell (placed), trd-20260928T0845Z-SKYUSD-sell (placed), trd-20260928T0845Z-SOLUSD-sell (placed), trd-20260928T0845Z-SUSHIUSD-sell (placed), trd-20260928T0845Z-YFIUSD-sell (placed)
+- Esito: liquidazione: vendute 9 posizioni; restano BONK/USD, il prossimo risveglio riprova
+- Rischio residuo: investito 9409.71$ (prima degli ordini di questo slot) su BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SKYUSD, SOLUSD, SUSHIUSD, YFIUSD; 0 ordini aperti
+- Prossimo compito: riprovare la vendita di BONK/USD
+- Attenzione: saltati 1 slot dall'ultimo risveglio (20260928T0815Z): nessun recupero
+- Attenzione: trd-20260928T0845Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {"available":"156921866.806502359","balance":"156921866.806502359","code":40310000,"message":"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)","symbol":"
+<!-- entry -->
 ## 2026-09-28T08:15:00+00:00 · ok
 
 - Avvio: 2026-09-28T08:15:28.018677+00:00  Fine: 2026-09-28T08:16:17.575085+00:00
