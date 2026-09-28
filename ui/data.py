@@ -18,6 +18,7 @@ from pathlib import Path
 from trader import config, learn, notify
 from trader.records import ENTRY_MARK as PROGRESS_MARK
 from trader.records import alpaca_objects
+from trader.wake import ours
 
 TRADE_OUTCOMES = ("placed", "adopted", "dry_run", "filled")
 # Where the exit levels of open positions may live. The first one that exists wins.
@@ -293,7 +294,8 @@ def trades(journal: list[dict], evidence: list[dict]) -> list[dict]:
 def closed_stats(r: Reader, journal: list[dict], evidence: list[dict]) -> dict:
     fills, orders = alpaca_objects(evidence, "fill"), alpaca_objects(evidence, "order")
     try:
-        closed = learn.closed_trades(fills, orders, journal, learn.FEE_PCT)
+        # only the agent's own orders, as the reflection counts them: not a manual test order
+        closed = learn.closed_trades(ours(fills, orders), orders, journal, learn.FEE_PCT)
         summary = learn.summarize(closed)
     except Exception as e:  # noqa: BLE001 - shown on the page, never hidden
         r.problems.append(f"operazioni chiuse non calcolate: {type(e).__name__}: {e}")

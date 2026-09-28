@@ -240,6 +240,7 @@ ogni run dello stesso slot. Prima di inviare, il codice cerca l'id tra gli ordin
 
 Le regole di Alpaca che il codice segue, con le fonti, sono in [docs/alpaca-notes.md](docs/alpaca-notes.md).
 I record sono descritti in [docs/records.md](docs/records.md).
+Il risultato finale della corsa dal 26 al 28 settembre 2026, con i numeri letti da Alpaca, è in [docs/results.md](docs/results.md).
 
 ## Chi lo sveglia
 
