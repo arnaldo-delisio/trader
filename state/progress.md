@@ -3,6 +3,16 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T10:00:00+00:00 · liquidating
+
+- Avvio: 2026-09-28T10:02:41.899922+00:00  Fine: 2026-09-28T10:03:20.827101+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36407258497
+- Cosa è cambiato: trd-20260928T1000Z-BONKUSD-sell (rejected)
+- Esito: liquidazione: niente da vendere; restano BONK/USD, il prossimo risveglio riprova
+- Rischio residuo: investito 577.47$ (prima degli ordini di questo slot) su BONKUSD; 0 ordini aperti
+- Prossimo compito: riprovare la vendita di BONK/USD
+- Attenzione: trd-20260928T1000Z-BONKUSD-sell: rifiutato da Alpaca: HTTP 403 {"available":"156921866.806502359","balance":"156921866.806502359","code":40310000,"message":"insufficient balance for BONK (requested: 156921866.806502372, available: 156921866.806502359)","symbol":"
+<!-- entry -->
 ## 2026-09-28T09:45:00+00:00 · liquidating
 
 - Avvio: 2026-09-28T09:47:31.941802+00:00  Fine: 2026-09-28T09:48:03.995950+00:00
