@@ -3,6 +3,14 @@
 Scritte dalla riflessione ogni 6 ore, la più recente in alto. Il modello le rilegge a ogni risveglio.
 
 <!-- lesson -->
+## 2026-09-28 01:52 UTC · slot 20260928T0145Z
+
+- Con soli 2 trade chiusi (1 vinto a take-profit, 1 perso a stop) il campione resta troppo piccolo per un'attribuzione statistica affidabile sui pesi dei segnali: non tocco i pesi in questa riflessione.
+- Entrambi i trade chiusi provengono dall'esplorazione (regola: 0 trade su decine di wake), e i giornali mostrano ripetutamente punteggi vicini ma sotto 0.80 (es. 0.79, 0.76, 0.89 citato ma mai eseguito come regola) per giorni consecutivi: questo pattern ripetuto, non un singolo trade, giustifica un piccolo abbassamento di entry_threshold per permettere qualche trade a regola vera e verificarne la q
+- Il segnale volume mostra la massima divergenza osservata (positivo: +12.99% vincente; non positivo: -2.99% perdente, corr=1.0), ma con solo 2 osservazioni è ancora rumore: da confermare con più trade prima di alzarne il peso.
+- Il trade perso (UNIUSD) ha impiegato 24h per toccare lo stop mentre il vincente (GRTUSD) ha centrato il take-profit in 5.4h: nessuna indicazione chiara su stop_atr_mult o tp_atr_mult con soli 2 esiti, meglio aspettare altri trade prima di modificarli.
+- Servono almeno ~10 trade chiusi (regola + esplorazione) per distinguere segnale da fortuna: fino ad allora limitare i cambiamenti a un solo parametro alla volta e solo se supportato da pattern ripetuti nei log, come il mancato innesco della regola piena.
+<!-- lesson -->
 ## 2026-09-27 20:27 UTC · slot 20260927T2015Z
 
 - Con un solo trade chiuso (n=1, +89.33$ su GRTUSD, esplorazione, TP centrato) il campione è troppo piccolo per qualsiasi attribuzione statistica: non modifico pesi, soglie, stop o take-profit in questa riflessione.

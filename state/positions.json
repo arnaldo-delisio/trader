@@ -51,8 +51,8 @@
       "entry_price": 3.73e-06,
       "entry_t": 1790525846,
       "explore": true,
-      "highest": 3.745e-06,
-      "stop": 3.515960026936586e-06,
+      "highest": 3.765e-06,
+      "stop": 3.516000477349159e-06,
       "take_profit": 4.091799285037878e-06
     },
     "DOT/USD": {
@@ -100,26 +100,26 @@
       "take_profit": 15.175744285783015
     },
     "ONDO/USD": {
-      "atr_at_entry": 0.008146686072782454,
-      "client_order_id": "trd-20260927T2015Z-ONDOUSD-buy",
-      "entry_at": "2026-09-27 20:27 UTC",
-      "entry_price": 0.5554,
-      "entry_t": 1790540822,
-      "explore": true,
-      "highest": 0.5554,
-      "stop": 0.5228132557088702,
-      "take_profit": 0.6042801164366948
+      "atr_at_entry": 0.012221451375185322,
+      "client_order_id": "trd-20260928T0145Z-ONDOUSD-buy",
+      "entry_at": "2026-09-28 01:51 UTC",
+      "entry_price": 0.5757,
+      "entry_t": 1790560302,
+      "explore": false,
+      "highest": 0.5757,
+      "stop": 0.5268141944992587,
+      "take_profit": 0.6490287082511119
     },
     "POL/USD": {
-      "atr_at_entry": 0.0015476943345646144,
-      "client_order_id": "trd-20260927T2315Z-POLUSD-buy",
-      "entry_at": "2026-09-27 23:18 UTC",
-      "entry_price": 0.12148,
-      "entry_t": 1790551131,
+      "atr_at_entry": 0.0015484150117471077,
+      "client_order_id": "trd-20260928T0145Z-POLUSD-buy",
+      "entry_at": "2026-09-28 01:51 UTC",
+      "entry_price": 0.1195,
+      "entry_t": 1790560302,
       "explore": true,
-      "highest": 0.12148,
-      "stop": 0.11528922266174155,
-      "take_profit": 0.1307661660073877
+      "highest": 0.1195,
+      "stop": 0.11330633995301156,
+      "take_profit": 0.12879049007048265
     },
     "SKY/USD": {
       "atr_at_entry": 0.0014328781478081865,
@@ -128,8 +128,8 @@
       "entry_price": 0.08131,
       "entry_t": 1790551131,
       "explore": false,
-      "highest": 0.08131,
-      "stop": 0.07557848740876724,
+      "highest": 0.0848747,
+      "stop": 0.07847536510203185,
       "take_profit": 0.0899072688868491
     },
     "SOL/USD": {
@@ -177,5 +177,5 @@
       "take_profit": 2622.26135795356
     }
   },
-  "updated_at": "2026-09-27T23:18:51.932695+00:00"
+  "updated_at": "2026-09-28T01:51:42.048162+00:00"
 }

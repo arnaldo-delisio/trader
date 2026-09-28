@@ -3,6 +3,17 @@
 Passaggio di consegne tra un risveglio e il successivo. Il più recente in alto.
 
 <!-- entry -->
+## 2026-09-28T01:45:00+00:00 · ok
+
+- Avvio: 2026-09-28T01:51:42.048050+00:00  Fine: 2026-09-28T01:52:24.468512+00:00
+- Run: https://github.com/arnaldo-delisio/trader/actions/runs/36367575091
+- Cosa è cambiato: trd-20260928T0145Z-UNIUSD-sell (placed), trd-20260928T0145Z-ONDOUSD-buy (placed), trd-20260928T0145Z-POLUSD-buy (placed)
+- Esito: vendi UNI/USD: inviato; compra ONDO/USD: inviato; compra POL/USD: inviato
+- Rischio residuo: investito 11897.64$ (prima degli ordini di questo slot) su AAVEUSD, ARBUSD, AVAXUSD, BATUSD, BONKUSD, DOTUSD, ETHUSD, FILUSD, LINKUSD, SKYUSD, SOLUSD, SUSHIUSD, UNIUSD, YFIUSD; 2 ordini aperti
+- Prossimo compito: Verificare se ETH scende sotto la soglia di uscita -0.3 nel prossimo slot, controllare l'esito dell'ingresso su ONDO e POL, e monitorare se GRT (score 0.96 in watch-list) resta valido per un ingresso pieno futuro.
+- Attenzione: saltati 9 slot dall'ultimo risveglio (20260927T2315Z): nessun recupero
+- Attenzione: ordine trd-20260927T2315Z-POLUSD-buy (buy POL/USD, aperto da 152 min): annullato
+<!-- entry -->
 ## 2026-09-27T23:15:00+00:00 · ok
 
 - Avvio: 2026-09-27T23:18:51.932595+00:00  Fine: 2026-09-27T23:19:38.898271+00:00
